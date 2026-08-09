@@ -9,10 +9,37 @@
   <body>
     <header>
       <nav>
+        <ul>
+          <li><a href="index.html">Meu Jardim</a></li>
+          <li><a href="catalogo.html" aria-current="page">Pesquisar plantas</a></li>
+        </ul>
       </nav>
     </header>
   
     <main>
+      <h1>Catalogo de plantas</h1>
+      
+      <section class="secao-busca">
+        <h2>Busca de plantas</h2>
+        <form action="#" method="GET">
+          <label for="busca">Nome planta:</label>
+          <input type="serch" id="busca" name="q" placeholder="Ex: Tomate Cereja">
+          <button type="submit">Buscar</button>
+        </form>
+      </section>
+
+      <section class="secao-resultados">
+        <h2>Resultado de pesquisa</h2>
+
+        <article class="card-planta">
+          <figure>
+            <img src="assets/images/tomate-cereja.jpg" alt="Muda de tomate cereja em vaso pequeno" width="250" height="200" loading="lazy">
+          </figure>
+          <h3>Tomate cereja</h3>
+          <p>Luz: Sol pleno | Dificuldade: Média</p>
+          <button type="button">Adicionar ao Jardim</button>
+        </article>
+      </section>
     </main>
 
     <footer>
