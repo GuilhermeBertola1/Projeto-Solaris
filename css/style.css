@@ -170,3 +170,30 @@ p {
   color: var(--cor-texto-suave);
   margin-bottom: 1rem;
 }
+
+/*Botoes e links dos cards*/
+.card-planta a,
+.card-planta button,
+.secao-busca button {
+  display: inline-block;
+  text-align: center;
+  background-color: var(--cor-primaria);
+  color: var(--cor-card);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.65rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
+  margin-top: auto;
+}
+
+.card-planta a:hover,
+.card-planta button:hover,
+.secao-busca button:hover {
+  background-color: var(--cor-primaria-hover);
+}
+
+
