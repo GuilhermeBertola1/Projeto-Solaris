@@ -278,3 +278,14 @@ p {
 }
 
 /*Rodape*/
+footer {
+  background-color: var(--cor-card);
+  border-top: 1px solid var(--cor-borda);
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: auto;
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+/*Responsividade*/
