@@ -196,4 +196,52 @@ p {
   background-color: var(--cor-primaria-hover);
 }
 
+/*suspendent Panel*/
+.painel-dica{
+  background-color: #fffde7;
+  border: 1px solid #fff59d;
+  border-left: 6px solid #fbc02d;
+  border-radius: var(--raio-borda);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--sombra-card);
+}
 
+.painel-dica h2 {
+  border-left: none;
+  padding-left: 0;
+  color: #f57f17;
+}
+
+/*Formulario busca*/
+.secao-busca {
+  background-color: var(--cor-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--sombra-card);
+}
+
+.secao-busca form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.secao-busca label {
+  font-weight: 600;
+  color: var(--cor-texto);
+}
+
+.secao-busca input[type="search"] {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+}
