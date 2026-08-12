@@ -288,4 +288,29 @@ footer {
   font-size: 0.9rem;
 }
 
-/*Responsividade*/
+/*Responsividade celular*/
+@media (max-width: 600px) {
+  nav ul {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  nav a {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .secao-busca form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .secao-busca button {
+    width: 100%;
+  }
+}
