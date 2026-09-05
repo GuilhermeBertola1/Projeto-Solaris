@@ -34,3 +34,5 @@ function renderizarJardim(estado) {
     ? estado.plantas.map(cardPlantaHTML).join('')
     : `<p class="mensagem-status">Seu jardim está vazio. <a href="catalogo.html">Busque plantas no catálogo</a> e adicione a primeira.</p>`;
 }
+
+makeJardimViewModel(renderizarJardim);

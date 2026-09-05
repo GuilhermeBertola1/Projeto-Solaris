@@ -1,29 +1,29 @@
-const MS_POR_DIA = 1000*60*60*24;
+const MS_POR_DIA = 1000 * 60 * 60 * 24;
 
-export function calcularEstadoPlanta(planta){
-    const diasDePlantada = Math.max(0, Math.floor((Date.now() - planta.dataAdicionada)/MS_POR_DIA));
-    const diasSemRegar = Math.max(0, (Date.now() - planta.ultimaRega)/MS_POR_DIA);
+export function calcularEstadoPlanta(planta) {
+  const diasDePlantada = Math.max(0, Math.floor((Date.now() - planta.dataAdicionada) / MS_POR_DIA));
+  const diasSemRegar = Math.max(0, (Date.now() - planta.ultimaRega) / MS_POR_DIA);
 
-    let fase;
-    if(diasDePlantada < 15){
-        fase = 'brotacao';
-    }else if(diasDePlantada < 30){
-        fase = 'vegetativo';
-    }else{
-        fase = 'adulta';
-    }
+  let fase;
+  if (diasDePlantada < 15) {
+    fase = 'brotacao';
+  } else if (diasDePlantada < 30) {
+    fase = 'vegetativo';
+  } else {
+    fase = 'adulta';
+  }
 
-    let humor;
-    if (diasSemRegar > 3) {
-        humor = 'sedenta';
-    } else if (diasSemRegar > 1.5) {
-        humor = 'atencao';
-    } else {
-        humor = 'feliz';
-    }
+  let humor;
+  if (diasSemRegar > 3) {
+    humor = 'sedenta';
+  } else if (diasSemRegar > 1.5) {
+    humor = 'atencao';
+  } else {
+    humor = 'feliz';
+  }
 
-    return { diasDePlantada, diasSemRegar, fase, humor };
-};
+  return { diasDePlantada, diasSemRegar, fase, humor };
+}
 
 export const FASES_INFO = {
   brotacao: {

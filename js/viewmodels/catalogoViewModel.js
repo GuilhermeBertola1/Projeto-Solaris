@@ -1,4 +1,4 @@
-import {obterPlantas} from '../models/plantasModel.js';
+import { obterPlantas } from '../models/plantasModel.js';
 
 export function makeViewModel(onStateChange) {
   const estadoBase = {
@@ -29,4 +29,3 @@ export function makeViewModel(onStateChange) {
     }
   };
 }
-

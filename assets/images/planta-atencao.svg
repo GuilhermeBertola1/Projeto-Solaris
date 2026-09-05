@@ -1,0 +1,25 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+  <!-- sombra do vaso -->
+  <ellipse cx="100" cy="192" rx="42" ry="6" fill="#000000" opacity="0.08"/>
+
+  <!-- caule levemente inclinado -->
+  <path d="M100,150 Q104,112 98,80" stroke="#558b2f" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- folhas mais horizontais, cor um pouco mais apagada -->
+  <g fill="#7cb342" stroke="#33691e" stroke-width="2">
+    <ellipse cx="62" cy="105" rx="26" ry="13" transform="rotate(-60 62 105)"/>
+    <ellipse cx="138" cy="105" rx="26" ry="13" transform="rotate(60 138 105)"/>
+    <ellipse cx="58" cy="135" rx="22" ry="12" transform="rotate(-45 58 135)"/>
+    <ellipse cx="140" cy="135" rx="22" ry="12" transform="rotate(45 140 135)"/>
+    <ellipse cx="98" cy="76" rx="14" ry="22" transform="rotate(-8 98 76)"/>
+  </g>
+
+  <!-- vaso -->
+  <path d="M58,150 L142,150 L130,190 L70,190 Z" fill="#c47a4a" stroke="#8a5230" stroke-width="3"/>
+  <rect x="52" y="138" width="96" height="16" rx="5" fill="#d98a5a" stroke="#8a5230" stroke-width="3"/>
+
+  <!-- rosto neutro no vaso -->
+  <ellipse cx="85" cy="170" rx="4" ry="3" fill="#3e2723"/>
+  <ellipse cx="115" cy="170" rx="4" ry="3" fill="#3e2723"/>
+  <path d="M83,180 L117,180" stroke="#3e2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,41 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+  <!-- sombra do vaso -->
+  <ellipse cx="100" cy="192" rx="42" ry="6" fill="#000000" opacity="0.08"/>
+
+  <!-- caule ereto -->
+  <path d="M100,150 L100,78" stroke="#2e7d32" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- folhas erguidas e abertas (vitalidade) -->
+  <g fill="#43a047" stroke="#1b5e20" stroke-width="2">
+    <ellipse cx="70" cy="95" rx="26" ry="14" transform="rotate(-35 70 95)"/>
+    <ellipse cx="130" cy="95" rx="26" ry="14" transform="rotate(35 130 95)"/>
+    <ellipse cx="60" cy="130" rx="24" ry="13" transform="rotate(-20 60 130)"/>
+    <ellipse cx="140" cy="130" rx="24" ry="13" transform="rotate(20 140 130)"/>
+    <ellipse cx="100" cy="70" rx="16" ry="26"/>
+  </g>
+
+  <!-- nervura central das folhas -->
+  <g stroke="#1b5e20" stroke-width="1.5" fill="none" opacity="0.6">
+    <path d="M55,90 L85,100"/>
+    <path d="M145,90 L115,100"/>
+    <path d="M100,50 L100,88"/>
+  </g>
+
+  <!-- florzinha -->
+  <g transform="translate(100,52)">
+    <circle r="6" fill="#fdd835"/>
+    <circle cx="-8" cy="-3" r="5" fill="#fff59d"/>
+    <circle cx="8" cy="-3" r="5" fill="#fff59d"/>
+    <circle cx="-8" cy="6" r="5" fill="#fff59d"/>
+    <circle cx="8" cy="6" r="5" fill="#fff59d"/>
+  </g>
+
+  <!-- vaso -->
+  <path d="M58,150 L142,150 L130,190 L70,190 Z" fill="#c47a4a" stroke="#8a5230" stroke-width="3"/>
+  <rect x="52" y="138" width="96" height="16" rx="5" fill="#d98a5a" stroke="#8a5230" stroke-width="3"/>
+
+  <!-- rosto feliz no vaso -->
+  <circle cx="85" cy="170" r="4" fill="#3e2723"/>
+  <circle cx="115" cy="170" r="4" fill="#3e2723"/>
+  <path d="M80,178 Q100,190 120,178" stroke="#3e2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

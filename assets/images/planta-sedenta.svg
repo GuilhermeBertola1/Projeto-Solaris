@@ -1,0 +1,33 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+  <!-- sombra do vaso -->
+  <ellipse cx="100" cy="192" rx="42" ry="6" fill="#000000" opacity="0.08"/>
+
+  <!-- caule curvado, murcho -->
+  <path d="M100,150 Q115,120 95,100 Q80,85 88,72" stroke="#8d6e63" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <!-- folhas caídas, tons esverdeados-acastanhados -->
+  <g fill="#a1887f" stroke="#6d4c41" stroke-width="2">
+    <ellipse cx="70" cy="118" rx="24" ry="12" transform="rotate(150 70 118)"/>
+    <ellipse cx="125" cy="128" rx="24" ry="12" transform="rotate(-150 125 128)"/>
+    <ellipse cx="88" cy="72" rx="13" ry="20" transform="rotate(150 88 72)"/>
+  </g>
+
+  <!-- vaso -->
+  <path d="M58,150 L142,150 L130,190 L70,190 Z" fill="#c47a4a" stroke="#8a5230" stroke-width="3"/>
+  <rect x="52" y="138" width="96" height="16" rx="5" fill="#d98a5a" stroke="#8a5230" stroke-width="3"/>
+
+  <!-- rachaduras na terra -->
+  <g stroke="#8a5230" stroke-width="1.5" fill="none" opacity="0.7">
+    <path d="M70,143 L78,150"/>
+    <path d="M110,144 L102,150"/>
+    <path d="M130,143 L122,150"/>
+  </g>
+
+  <!-- rosto triste no vaso -->
+  <path d="M81,167 L89,171" stroke="#3e2723" stroke-width="3" stroke-linecap="round"/>
+  <path d="M119,167 L111,171" stroke="#3e2723" stroke-width="3" stroke-linecap="round"/>
+  <path d="M82,184 Q100,174 118,184" stroke="#3e2723" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- gota pedindo água -->
+  <path d="M150,60 Q158,74 150,82 Q142,74 150,60 Z" fill="#64b5f6" stroke="#1976d2" stroke-width="1.5"/>
+</svg>
