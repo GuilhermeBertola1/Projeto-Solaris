@@ -15,23 +15,23 @@
       </ul>
     </nav>
   </header>
-  
+
   <main>
     <h1>Meu Jardim Virtual</h1>
-    
+
     <section class="secao-plantas">
-      <h2>Plantas que precisam de atencao</h2>
-      <div class="container-cards">
-        <article class="card-planta">
-          <figure>
-            <img src="assets/images/jiboia.jpg" alt="Planta Jiboia com folhas verdes pendentes" width="250" height="200" loading="lazy">
-            <figcaption>Epipremnum aureum</figcaption>
-          </figure>
-          <h3>Jiboia</h3>
-          <p>Status: Regar hoje</p>
-          <a href="perfil.html">Ver detalhes</a>
-        </article>
-      </div>
+      <h2>Plantas que precisam de atenção</h2>
+      <noscript>
+        <p class="mensagem-status">
+          Este painel depende de JavaScript para carregar seu jardim. Habilite o JavaScript no navegador.
+        </p>
+      </noscript>
+      <div class="container-cards" id="container-atencao"></div>
+    </section>
+
+    <section class="secao-plantas">
+      <h2>Todas as plantas do jardim</h2>
+      <div class="container-cards" id="container-todas"></div>
     </section>
 
     <aside class="painel-dica">
@@ -45,5 +45,6 @@
     <p>Projeto desenvolvido para disciplina SCOM</p>
   </footer>
 
+  <script type="module" src="js/dashboardApp.js"></script>
 </body>
 </html>
