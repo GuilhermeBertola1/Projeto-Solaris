@@ -10,7 +10,6 @@ export async function obterPlantas(termo = ''){
 
     const resultado = await resposta.json();
     
-
     return resultado.data.map(item => ({
       id: item.id,
       nome: item.common_name || "Planta Desconhecida",
