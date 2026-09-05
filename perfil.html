@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Jiboia - Projeto Solaris</title>
+    <title>Perfil da planta - Projeto Solaris</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
@@ -17,37 +17,21 @@
     </header>
 
     <main>
-      <h1>Perfil da planta:Jiboia</h1>
-      <section class="secao-info-basica">
-        <h2>Informacoes</h2>
-        <figure>
-          <img src="assets/images/jiboia.jpg" alt="Planta Jiboia com folhas verdes pendentes" width="400" height="300" loading="lazy">
-          <figcaption>Epipremnum aureum</figcaption>
-        </figure>
-        <ul>
-          <li><strong>Frequência de Rega:</strong> 2 vezes por semana</li>
-          <li><strong>Luz Ideal:</strong> Meia-sombra (luz indireta)</li>
-        </ul>
-      </section>
+      <h1 id="titulo-planta">Perfil da planta</h1>
 
-      <section class="secao-simulacao">
-        <h2>Simulacao de crescimento da planta</h2>
-        <ol>
-          <li>
-            <h3>Fase 1: Brotacao (Dia 1 a 15)</h3>
-            <p>Mantenha a terra levemente úmida. As primeiras raízes estão se fixando no substrato.</p>
-          </li>
-          <li>
-            <h3>Fase 2: Crescimento Vegetativo (Dias 16 em diante)</h3>
-            <p>Status atual: <strong>Em andamento</strong>. O ideal é adubar a cada 30 dias com NPK 10-10-10.</p>
-          </li>
-        </ol>
-      </section>
+      <noscript>
+        <p class="mensagem-status">
+          Esta página depende de JavaScript para carregar os dados da planta. Habilite o JavaScript no navegador.
+        </p>
+      </noscript>
+
+      <div id="conteudo-perfil"></div>
     </main>
 
     <footer>
       <p>Projeto desenvolvido para disciplina SCOM</p>
     </footer>
 
+    <script type="module" src="js/perfilApp.js"></script>
   </body>
 </html>
