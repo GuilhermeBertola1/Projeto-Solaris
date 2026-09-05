@@ -15,10 +15,10 @@
         </ul>
       </nav>
     </header>
-  
+
     <main>
       <h1>Catalogo de plantas</h1>
-      
+
       <section class="secao-busca">
         <h2>Busca de plantas</h2>
         <form id="form-busca" action="#" method="GET">
@@ -28,18 +28,16 @@
         </form>
       </section>
 
+      <p id="feedback-jardim" class="visualmente-oculto" aria-live="polite"></p>
+
       <section class="secao-resultados">
         <h2>Resultado de pesquisa</h2>
-        <div class="container-cards" id="container-resultados">
-          <article class="card-planta">
-            <figure>
-              <img src="assets/images/tomate-cereja.jpg" alt="Muda de tomate cereja em vaso pequeno" width="250" height="200" loading="lazy">
-            </figure>
-            <h3>Tomate cereja</h3>
-            <p>Luz: Sol pleno | Dificuldade: Média</p>
-            <button type="button">Adicionar ao Jardim</button>
-          </article>
-        </div>
+        <noscript>
+          <p class="mensagem-status">
+            Este catálogo depende de JavaScript para buscar as plantas. Habilite o JavaScript no navegador para usar esta página.
+          </p>
+        </noscript>
+        <div class="container-cards" id="container-resultados"></div>
       </section>
     </main>
 
