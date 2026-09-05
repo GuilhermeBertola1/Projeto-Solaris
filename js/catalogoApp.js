@@ -1,10 +1,12 @@
 import { makeViewModel } from './viewmodels/catalogoViewModel.js';
+import { adicionarAoJardim } from './models/jardimModel.js';
 
 const inputBusca = document.getElementById('busca');
 const formBusca = document.getElementById('form-busca');
 const containerResultados = document.getElementById('container-resultados');
+const feedback = document.getElementById('feedback-jardim');
 
-function rednView(estado){
+function renderizarResultados(estado){
   if(estado.carregando){
     containerResultados.innerHTML = `<p class="mensagem-status">Carregando plantas...</p>`;
     return;
@@ -28,7 +30,7 @@ function rednView(estado){
   `).join('');
 };
 
-const viewModel = makeViewModel(rednView);
+const viewModel = makeViewModel(renderizarResultados);
 
 inputBusca.addEventListener('input', (e) => {
   viewModel.buscar(e.target.value);
@@ -37,6 +39,24 @@ inputBusca.addEventListener('input', (e) => {
 formBusca.addEventListener('submit', (e) => {
   e.preventDefault();
   viewModel.buscar(inputBusca.value);
+});
+
+containerResultados.addEventListener('click',  (e) => {
+  const botao = e.target.closest('button[data-adicionar]');
+  if (!botao) return;
+
+  const indice = Number(botao.dataset.indice);
+  const planta = viewModel.estado.plantas[indice];
+  if (!planta) return;
+
+  adicionarAoJardim(planta);
+
+  botao.textContent = 'Adicionado';
+  botao.disabled = true;
+
+  if (feedback) {
+    feedback.textContent = `${planta.nome} foi adicionada ao seu jardim.`;
+  }
 });
 
 viewModel.buscar('');
