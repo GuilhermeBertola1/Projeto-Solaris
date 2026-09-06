@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projeto Solaris - Meu Jardim</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="index.html" aria-current="page">Meu Jardim</a></li>
-        <li><a href="catalogo.html">Pesquisar Plantas</a></li>
-      </ul>
-    </nav>
-  </header>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Meu Jardim Virtual do Projeto Solaris: acompanhe as plantas que você cultiva, veja quais precisam de rega e siga a linha do tempo de crescimento de cada uma.">
+    <title>Meu Jardim - Projeto Solaris</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
 
-  <main>
-    <h1>Meu Jardim Virtual</h1>
+    <header>
+      <nav aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html" aria-current="page">Meu Jardim</a></li>
+          <li><a href="catalogo.html">Pesquisar Plantas</a></li>
+        </ul>
+      </nav>
+    </header>
 
-    <section class="secao-plantas">
-      <h2>Plantas que precisam de atenção</h2>
-      <noscript>
-        <p class="mensagem-status">
-          Este painel depende de JavaScript para carregar seu jardim. Habilite o JavaScript no navegador.
-        </p>
-      </noscript>
-      <div class="container-cards" id="container-atencao"></div>
-    </section>
+    <main id="conteudo-principal">
+      <h1>Meu Jardim Virtual</h1>
 
-    <section class="secao-plantas">
-      <h2>Todas as plantas do jardim</h2>
-      <div class="container-cards" id="container-todas"></div>
-    </section>
+      <section class="secao-plantas">
+        <h2>Plantas que precisam de atenção</h2>
+        <noscript>
+          <p class="mensagem-status">
+            Este painel depende de JavaScript para carregar seu jardim. Habilite o JavaScript no navegador.
+          </p>
+        </noscript>
+        <div class="container-cards" id="container-atencao"></div>
+      </section>
 
-    <aside class="painel-dica">
-      <h2>Dicas Diarias</h2>
-      <p>Evite regar suas plantas sob o sol forte do meio-dia para não queimar as folhas</p>
-    </aside>
+      <section class="secao-plantas">
+        <h2>Todas as plantas do jardim</h2>
+        <div class="container-cards" id="container-todas"></div>
+      </section>
 
-  </main>
+      <aside class="painel-dica">
+        <h2>Dicas diárias</h2>
+        <p>Evite regar suas plantas sob o sol forte do meio-dia para não queimar as folhas.</p>
+      </aside>
+    </main>
 
-  <footer>
-    <p>Projeto desenvolvido para disciplina SCOM</p>
-  </footer>
+    <footer>
+      <p>Projeto desenvolvido para a disciplina SCOM.</p>
+    </footer>
 
-  <script type="module" src="js/dashboardApp.js"></script>
-</body>
+    <script src="js/utils.js"></script>
+    <script src="js/models/simulacaoModel.js"></script>
+    <script src="js/models/jardimModel.js"></script>
+    <script src="js/viewmodels/jardimViewModel.js"></script>
+    <script src="js/views/cardPlanta.js"></script>
+    <script src="js/dashboardApp.js"></script>
+  </body>
 </html>

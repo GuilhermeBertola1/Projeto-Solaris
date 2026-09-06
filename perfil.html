@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perfil da planta no Projeto Solaris: fase de crescimento, estado de rega e a linha do tempo simulada da germinação até a fase adulta.">
     <title>Perfil da planta - Projeto Solaris</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
+    <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
     <header>
-      <nav>
+      <nav aria-label="Navegação principal">
         <ul>
           <li><a href="index.html">Meu Jardim</a></li>
           <li><a href="catalogo.html">Pesquisar Plantas</a></li>
@@ -16,7 +20,7 @@
       </nav>
     </header>
 
-    <main>
+    <main id="conteudo-principal">
       <h1 id="titulo-planta">Perfil da planta</h1>
 
       <noscript>
@@ -25,13 +29,20 @@
         </p>
       </noscript>
 
+      <p id="feedback-rega" class="visualmente-oculto" aria-live="polite"></p>
+
       <div id="conteudo-perfil"></div>
     </main>
 
     <footer>
-      <p>Projeto desenvolvido para disciplina SCOM</p>
+      <p>Projeto desenvolvido para a disciplina SCOM.</p>
     </footer>
 
-    <script type="module" src="js/perfilApp.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/models/simulacaoModel.js"></script>
+    <script src="js/models/jardimModel.js"></script>
+    <script src="js/viewmodels/jardimViewModel.js"></script>
+    <script src="js/views/cardPlanta.js"></script>
+    <script src="js/perfilApp.js"></script>
   </body>
 </html>

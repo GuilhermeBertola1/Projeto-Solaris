@@ -1,22 +1,38 @@
-:root{
-  --cor-primaria: #2e7d32;
-  --cor-primaria-hover: #1b5e20;
-  --cor-secundaria: #1b5e20;
-  --cor-fundo: #f8faf8;
-  --cor-card: #f8faf8;
+:root {
+  /* Paleta principal — 6 cores.
+     Todas as demais cores do projeto são variações claras destas. */
+  --cor-primaria:     #2e7d32;  /* verde de ação: botões, links, destaques */
+  --cor-secundaria:   #1b5e20;  /* verde escuro: estados hover/ativo */
+  --cor-destaque:     #8a4b00;  /* âmbar escuro: painel de dicas */
+  --cor-fundo:        #f8faf8;  /* fundo da página e das superfícies */
+  --cor-texto:        #1c2d1c;  /* texto principal */
+  --cor-texto-suave:  #4a5d4a;  /* texto secundário e bordas de formulário */
 
-  --cor-texto: #1c2d1c;
-  --cor-texto-suave: #4a5d4a;
+  /* Variações claras derivadas da paleta acima */
+  --cor-primaria-clara: #e8f5e9;
+  --cor-borda:          #c8e6c9;
+  --cor-destaque-clara: #fffde7;
+  --cor-destaque-borda: #fbc02d;
 
-  --cor-alerta: #d32f2f;
-  --cor-borda: #c8e6c9;
-
+  /* Tipografia */
   --fonte-principal: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --raio-borda: 12px;
-  --sombra-card: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --sombra-hover: 0 6px 16px rgba(0, 0, 0, 0.1);
+
+  /* Medida máxima de linha para blocos de texto corrido (45–90 caracteres) */
+  --medida-texto: 65ch;
+
+  /* Raios de borda */
+  --raio-sm: 6px;
+  --raio-md: 12px;
+
+  /* Sombras */
+  --sombra-card:  0 4px 12px rgba(0, 0, 0, 0.05);
+  --sombra-hover: 0 6px 16px rgba(0, 0, 0, 0.10);
+
+  /* Espaçamentos recorrentes */
+  --espaco-secao: 2.5rem;
 }
 
+/* ---------- 2. Reset e base ---------- */
 *,
 *::before,
 *::after {
@@ -26,8 +42,8 @@
 }
 
 html {
+  font-size: 100%;
   scroll-behavior: smooth;
-  font-size: 100%
 }
 
 body {
@@ -41,12 +57,26 @@ body {
   min-height: 100vh;
 }
 
-:focus-visible{
-  outline: 3px solid var(--cor-primaria);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- 3. Utilitários de acessibilidade ---------- */
+:focus-visible {
+  outline: 3px solid var(--cor-secundaria);
   outline-offset: 3px;
 }
 
-/* Classe utilitária para conteúdo só para leitores de tela (sr-only) */
+/* Conteúdo exclusivo para leitores de tela */
 .visualmente-oculto {
   position: absolute;
   width: 1px;
@@ -59,15 +89,33 @@ body {
   border: 0;
 }
 
-/*cabecalho de nav*/
-header{
-  background-color: var(--cor-card);
+.link-pular {
+  position: absolute;
+  left: 0.5rem;
+  top: -100%;
+  z-index: 10;
+  background-color: var(--cor-primaria);
+  color: var(--cor-fundo);
+  padding: 0.65rem 1.2rem;
+  border-radius: var(--raio-sm);
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.2s;
+}
+
+.link-pular:focus {
+  top: 0.5rem;
+}
+
+/* ---------- 4. Cabeçalho e navegação ---------- */
+header {
+  background-color: var(--cor-fundo);
   border-bottom: 2px solid var(--cor-borda);
   padding: 1rem 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
-nav ul{
+nav ul {
   list-style: none;
   display: flex;
   gap: 1.5rem;
@@ -75,28 +123,29 @@ nav ul{
   align-items: center;
 }
 
-nav a{
+nav a {
+  display: block;
   text-decoration: none;
   color: var(--cor-texto-suave);
   font-weight: 600;
   font-size: 1.05rem;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.65rem 1rem;
+  border-radius: var(--raio-sm);
   transition: background-color 0.2s, color 0.2s;
 }
 
-nav a:hover{
-  color: var(--cor-primaria);
-  background-color: var(--cor-secundaria);
+nav a:hover {
+  color: var(--cor-secundaria);
+  background-color: var(--cor-primaria-clara);
 }
 
-nav a[aria-current="page"]{
-  color: var(--cor-card);
+nav a[aria-current="page"] {
+  color: var(--cor-fundo);
   background-color: var(--cor-primaria);
 }
 
-/*main*/
-main{
+/* ---------- 5. Layout principal e tipografia ---------- */
+main {
   flex: 1;
   width: 100%;
   max-width: 1000px;
@@ -129,10 +178,44 @@ p {
   margin-bottom: 0.75rem;
 }
 
-/*cards de planta*/
+/* ---------- 6. Componentes ---------- */
+
+/* Botão: uma única definição usada por links de ação, botões de formulário
+   e o botão "Reguei hoje" do perfil. */
+.botao {
+  display: inline-block;
+  text-align: center;
+  background-color: var(--cor-primaria);
+  color: var(--cor-fundo);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: inherit;
+  padding: 0.65rem 1.2rem;
+  border: none;
+  border-radius: var(--raio-sm);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.botao:hover {
+  background-color: var(--cor-secundaria);
+}
+
+.botao:disabled {
+  background-color: var(--cor-texto-suave);
+  cursor: default;
+}
+
+/* Dentro do card, a ação é empurrada para a base para alinhar os cards */
+.card-planta .botao {
+  margin-top: auto;
+}
+
+/* Grade de cards */
 .secao-plantas,
 .secao-resultados {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--espaco-secao);
 }
 
 .container-cards {
@@ -143,9 +226,9 @@ p {
 }
 
 .card-planta {
-  background-color: var(--cor-card);
+  background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-borda);
+  border-radius: var(--raio-md);
   padding: 1.25rem;
   box-shadow: var(--sombra-card);
   transition: transform 0.2s, box-shadow 0.2s;
@@ -167,8 +250,8 @@ p {
   width: 100%;
   height: 180px;
   object-fit: cover;
-  border-radius: 8px;
-  background-color: var(--cor-secundaria);
+  border-radius: var(--raio-sm);
+  background-color: var(--cor-borda);
 }
 
 .card-planta figcaption {
@@ -184,42 +267,16 @@ p {
   margin-bottom: 1rem;
 }
 
-/*Botoes e links dos cards*/
-.card-planta a,
-.card-planta button,
-.secao-busca button {
-  display: inline-block;
-  text-align: center;
-  background-color: var(--cor-primaria);
-  color: var(--cor-card);
-  text-decoration: none;
-  font-weight: 600;
-  padding: 0.65rem 1.2rem;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 0.95rem;
-  margin-top: auto;
-}
-
-.card-planta a:hover,
-.card-planta button:hover,
-.secao-busca button:hover {
-  background-color: var(--cor-primaria-hover);
-}
-
-.card-planta button:disabled {
-  background-color: var(--cor-texto-suave);
-  cursor: default;
-}
-
-/*Mensagens de status (carregando, sem resultado, jardim vazio)*/
+/* Mensagens de status: carregando, sem resultado, jardim vazio */
 .mensagem-status {
+  max-width: var(--medida-texto);
+  margin: 0 auto;
+  /* Dentro da grade de cards a mensagem ocupa a linha inteira, em vez de
+     ficar espremida na largura de uma coluna. */
+  grid-column: 1 / -1;
   text-align: center;
   color: var(--cor-texto-suave);
   padding: 2rem 1rem;
-  font-size: 1rem;
 }
 
 .mensagem-status a {
@@ -227,30 +284,37 @@ p {
   font-weight: 600;
 }
 
-/*suspendent Panel*/
-.painel-dica{
-  background-color: #fffde7;
-  border: 1px solid #fff59d;
-  border-left: 6px solid #fbc02d;
-  border-radius: var(--raio-borda);
+/* Painel lateral de dica */
+.painel-dica {
+  background-color: var(--cor-destaque-clara);
+  border: 1px solid var(--cor-destaque-borda);
+  border-left: 6px solid var(--cor-destaque-borda);
+  border-radius: var(--raio-md);
   padding: 1.25rem;
   margin-bottom: 2rem;
   box-shadow: var(--sombra-card);
 }
 
 .painel-dica h2 {
+  /* Âmbar escurecido: o tom anterior (#f57f17) dava 2.58:1 sobre este fundo
+     e reprovava no nível AA mesmo pelo limiar de texto grande. Agora: 6.63:1 */
+  color: var(--cor-destaque);
   border-left: none;
   padding-left: 0;
-  color: #f57f17;
 }
 
-/*Formulario busca*/
+.painel-dica p {
+  max-width: var(--medida-texto);
+  margin-bottom: 0;
+}
+
+/* Formulário de busca */
 .secao-busca {
-  background-color: var(--cor-card);
+  background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-borda);
+  border-radius: var(--raio-md);
   padding: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--espaco-secao);
   box-shadow: var(--sombra-card);
 }
 
@@ -271,21 +335,33 @@ p {
   flex: 1;
   min-width: 220px;
   padding: 0.6rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  /* Borda em 6.77:1 — o cinza #ccc anterior dava 1.53:1 e reprovava no
+     critério 1.4.11 (contraste de componentes) da WCAG 2.2 AA. */
+  border: 1px solid var(--cor-texto-suave);
+  border-radius: var(--raio-sm);
   font-size: 1rem;
   font-family: inherit;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
 }
 
-/*Simulacao / Perfil da planta*/
+/* ---------- 7. Perfil da planta e simulação ---------- */
 .secao-info-basica,
 .secao-simulacao {
-  background-color: var(--cor-card);
+  background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-borda);
+  border-radius: var(--raio-md);
   padding: 1.5rem;
   margin-bottom: 2rem;
   box-shadow: var(--sombra-card);
+}
+
+.secao-info-basica figure img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: var(--raio-sm);
+  background-color: var(--cor-borda);
 }
 
 .secao-info-basica ul {
@@ -295,29 +371,32 @@ p {
 
 .secao-info-basica li {
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--cor-secundaria);
+  border-bottom: 1px solid var(--cor-borda);
 }
 
 .secao-simulacao ol {
   list-style: none;
-  counter-reset: fase;
   margin-top: 1rem;
 }
 
 .secao-simulacao ol li {
-  counter-increment: fase;
   padding: 0.9rem 1rem;
   margin-bottom: 0.75rem;
   border: 1px solid var(--cor-borda);
-  border-radius: 8px;
+  border-radius: var(--raio-sm);
+}
+
+.secao-simulacao ol li p {
+  max-width: var(--medida-texto);
+  margin-bottom: 0;
 }
 
 .secao-simulacao ol li.fase-atual {
-  background-color: #e8f5e9;
+  background-color: var(--cor-primaria-clara);
   border-left: 4px solid var(--cor-primaria);
 }
 
-/*Estado emocional da planta (tamagotchi)*/
+/* Estado emocional da planta */
 .planta-humor {
   display: flex;
   align-items: center;
@@ -329,12 +408,11 @@ p {
 .humor-sprite {
   width: 40px;
   height: 40px;
-  background-color: transparent;
-  vertical-align: middle;
 }
 
 .planta-humor--grande {
   gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .humor-sprite--grande {
@@ -342,26 +420,9 @@ p {
   height: 96px;
 }
 
-#btn-regar {
-  display: inline-block;
-  background-color: var(--cor-primaria);
-  color: var(--cor-card);
-  font-weight: 600;
-  padding: 0.65rem 1.2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin: 0.5rem 0 1.25rem;
-  transition: background-color 0.2s;
-}
-
-#btn-regar:hover {
-  background-color: var(--cor-primaria-hover);
-}
-
-/*Rodape*/
+/* ---------- 8. Rodapé ---------- */
 footer {
-  background-color: var(--cor-card);
+  background-color: var(--cor-fundo);
   border-top: 1px solid var(--cor-borda);
   text-align: center;
   padding: 1.5rem;
@@ -370,21 +431,50 @@ footer {
   font-size: 0.9rem;
 }
 
-/*Responsividade celular*/
+/* ---------- 9. Responsividade ---------- */
+
+/* Tablet e telas intermediárias: duas colunas fixas de card */
+@media (min-width: 601px) and (max-width: 900px) {
+  main {
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .container-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  nav ul {
+    gap: 1rem;
+  }
+}
+
+/* Celular: navegação e formulário empilhados */
 @media (max-width: 600px) {
+  main {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
   nav ul {
     flex-direction: column;
     gap: 0.5rem;
   }
 
   nav a {
-    display: block;
     width: 100%;
     text-align: center;
   }
 
-  h1 {
-    font-size: 1.6rem;
+  .container-cards {
+    grid-template-columns: 1fr;
   }
 
   .secao-busca form {
@@ -392,7 +482,7 @@ footer {
     align-items: stretch;
   }
 
-  .secao-busca button {
+  .secao-busca .botao {
     width: 100%;
   }
 }

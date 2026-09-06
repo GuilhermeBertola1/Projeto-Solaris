@@ -3,12 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo - Projeto Solaris</title>
+    <meta name="description" content="Catálogo de plantas do Projeto Solaris: pesquise espécies por nome popular ou científico e adicione as que quiser cultivar ao seu jardim virtual.">
+    <title>Catálogo de plantas - Projeto Solaris</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
+    <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
     <header>
-      <nav>
+      <nav aria-label="Navegação principal">
         <ul>
           <li><a href="index.html">Meu Jardim</a></li>
           <li><a href="catalogo.html" aria-current="page">Pesquisar Plantas</a></li>
@@ -16,22 +20,22 @@
       </nav>
     </header>
 
-    <main>
-      <h1>Catalogo de plantas</h1>
+    <main id="conteudo-principal">
+      <h1>Catálogo de plantas</h1>
 
       <section class="secao-busca">
         <h2>Busca de plantas</h2>
-        <form id="form-busca" action="#" method="GET">
-          <label for="busca">Nome planta:</label>
-          <input type="search" id="busca" name="q" placeholder="Ex: Tomate Cereja">
-          <button type="submit">Buscar</button>
+        <form id="form-busca" action="#" method="get">
+          <label for="busca">Nome da planta:</label>
+          <input type="search" id="busca" name="q" placeholder="Ex: Tomate cereja">
+          <button type="submit" class="botao">Buscar</button>
         </form>
       </section>
 
       <p id="feedback-jardim" class="visualmente-oculto" aria-live="polite"></p>
 
       <section class="secao-resultados">
-        <h2>Resultado de pesquisa</h2>
+        <h2>Resultado da pesquisa</h2>
         <noscript>
           <p class="mensagem-status">
             Este catálogo depende de JavaScript para buscar as plantas. Habilite o JavaScript no navegador para usar esta página.
@@ -42,8 +46,16 @@
     </main>
 
     <footer>
-      <p>Projeto desenvolvido para disciplina SCOM</p>
+      <p>Projeto desenvolvido para a disciplina SCOM.</p>
     </footer>
-    <script type="module" src="js/catalogoApp.js"></script>
+
+    <script src="js/utils.js"></script>
+    <script src="js/models/dados_locais.js"></script>
+    <script src="js/models/simulacaoModel.js"></script>
+    <script src="js/models/plantasModel.js"></script>
+    <script src="js/models/jardimModel.js"></script>
+    <script src="js/viewmodels/catalogoViewModel.js"></script>
+    <script src="js/views/cardPlanta.js"></script>
+    <script src="js/catalogoApp.js"></script>
   </body>
 </html>

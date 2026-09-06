@@ -1,84 +1,92 @@
-import { makePerfilViewModel } from './viewmodels/jardimViewModel.js';
-import { FASES_INFO, HUMOR_INFO } from './models/simulacaoModel.js';
+(function (Solaris) {
+  'use strict';
 
-const params = new URLSearchParams(window.location.search);
-const instanceId = params.get('id');
+  const esc = Solaris.utils.escaparHTML;
 
-const elTitulo = document.getElementById('titulo-planta');
-const elConteudo = document.getElementById('conteudo-perfil');
+  const params = new URLSearchParams(window.location.search);
+  const instanceId = params.get('id');
 
-const ORDEM_FASES = ['brotacao', 'vegetativo', 'adulta'];
+  const elTitulo = document.getElementById('titulo-planta');
+  const elConteudo = document.getElementById('conteudo-perfil');
+  const elFeedback = document.getElementById('feedback-rega');
 
-function renderizar(estado) {
-  if (!estado.encontrada) {
-    elTitulo.textContent = 'Planta não encontrada';
-    elConteudo.innerHTML = `
-      <p class="mensagem-status">
-        Não encontramos essa planta no seu jardim.
-        <a href="index.html">Voltar para Meu Jardim</a>
-      </p>`;
-    return;
+  let viewModel = null;
+
+  let devolverFocoAoBotao = false;
+
+  function mensagemDeErro(texto) {
+    return '<p class="mensagem-status">' + texto +
+      ' <a href="index.html">Voltar para Meu Jardim</a></p>';
   }
 
-  if (!estado.planta) return;
+  function listaDeFases(faseAtual) {
+    return Solaris.simulacaoModel.ORDEM_FASES.map(function (chave) {
+      const info = Solaris.simulacaoModel.FASES_INFO[chave];
+      const atual = chave === faseAtual;
 
-  const planta = estado.planta;
-  const humor = HUMOR_INFO[planta.humor];
+      return '<li class="' + (atual ? 'fase-atual' : '') + '">' +
+        '<h3>' + esc(info.titulo) + (atual ? ' — Você está aqui' : '') + '</h3>' +
+        '<p>' + esc(info.descricao) + '</p>' +
+        '</li>';
+    }).join('');
+  }
 
-  elTitulo.textContent = `Perfil da planta: ${planta.nome}`;
+  function renderizar(estado) {
+    if (!estado.encontrada) {
+      elTitulo.textContent = 'Planta não encontrada';
+      elConteudo.innerHTML = mensagemDeErro('Não encontramos essa planta no seu jardim.');
+      return;
+    }
 
-  elConteudo.innerHTML = `
-    <section class="secao-info-basica">
-      <h2>Informações</h2>
-      <figure>
-        <img src="${planta.foto}" alt="${planta.nome}" width="400" height="300" loading="lazy">
-        <figcaption>${planta.especie}</figcaption>
-      </figure>
-      <ul>
-        <li><strong>Luz Ideal:</strong> ${planta.luz}</li>
-        <li><strong>Dificuldade:</strong> ${planta.dificuldade}</li>
-        <li><strong>No jardim há:</strong> ${planta.diasDePlantada} dia(s)</li>
-      </ul>
-    </section>
+    if (!estado.planta) {
+      return;
+    }
 
-    <section class="secao-simulacao">
-      <h2>Simulação de crescimento da planta</h2>
+    const planta = estado.planta;
+    elTitulo.textContent = 'Perfil da planta: ' + planta.nome;
 
-      <p class="planta-humor planta-humor--grande">
-        <img class="humor-sprite humor-sprite--grande" src="${humor.sprite}" alt="" width="96" height="96" loading="lazy">
-        <span>${humor.label}</span>
-      </p>
+    elConteudo.innerHTML = '' +
+      '<section class="secao-info-basica">' +
+        '<h2>Informações</h2>' +
+        '<figure>' +
+          '<img src="' + esc(planta.foto) + '" alt="' + esc(planta.nome) + '" ' +
+          'width="400" height="300" loading="eager" fetchpriority="high">' +
+          '<figcaption>' + esc(planta.especie) + '</figcaption>' +
+        '</figure>' +
+        '<ul>' +
+          '<li><strong>Luz ideal:</strong> ' + esc(planta.luz) + '</li>' +
+          '<li><strong>Dificuldade:</strong> ' + esc(planta.dificuldade) + '</li>' +
+          '<li><strong>No jardim há:</strong> ' + planta.diasDePlantada + ' dia(s)</li>' +
+        '</ul>' +
+      '</section>' +
+      '<section class="secao-simulacao">' +
+        '<h2>Simulação de crescimento da planta</h2>' +
+        Solaris.views.blocoHumor(planta.humor, true) +
+        '<button type="button" class="botao" id="btn-regar">Reguei hoje</button>' +
+        '<ol>' + listaDeFases(planta.fase) + '</ol>' +
+      '</section>';
 
-      <button type="button" id="btn-regar">Reguei hoje</button>
+    const botaoRegar = document.getElementById('btn-regar');
+    botaoRegar.addEventListener('click', function () {
+      devolverFocoAoBotao = true;
+      viewModel.regar();
 
-      <ol>
-        ${ORDEM_FASES.map(chave => {
-          const info = FASES_INFO[chave];
-          const atual = chave === planta.fase;
-          return `
-            <li class="${atual ? 'fase-atual' : ''}">
-              <h3>${info.titulo}${atual ? ' — Você está aqui' : ''}</h3>
-              <p>${info.descricao}</p>
-            </li>`;
-        }).join('')}
-      </ol>
-    </section>
-  `;
+      if (elFeedback && viewModel.estado.planta) {
+        const humorAtual = Solaris.simulacaoModel.HUMOR_INFO[viewModel.estado.planta.humor];
+        elFeedback.textContent = 'Rega registrada. Estado da planta: ' + humorAtual.label + '.';
+      }
+    });
 
-  document.getElementById('btn-regar').addEventListener('click', () => {
-    viewModel.regar();
-  });
-}
+    if (devolverFocoAoBotao) {
+      devolverFocoAoBotao = false;
+      botaoRegar.focus();
+    }
+  }
 
-let viewModel = null;
-
-if (!instanceId) {
-  elTitulo.textContent = 'Planta não encontrada';
-  elConteudo.innerHTML = `
-    <p class="mensagem-status">
-      Nenhuma planta foi informada na URL.
-      <a href="index.html">Voltar para Meu Jardim</a>
-    </p>`;
-} else {
-  viewModel = makePerfilViewModel(instanceId, renderizar);
-}
+  if (!instanceId) {
+    elTitulo.textContent = 'Planta não encontrada';
+    elConteudo.innerHTML = mensagemDeErro('Nenhuma planta foi informada no endereço da página.');
+  } else {
+    viewModel = Solaris.makePerfilViewModel(instanceId, renderizar);
+  }
+})(window.Solaris);

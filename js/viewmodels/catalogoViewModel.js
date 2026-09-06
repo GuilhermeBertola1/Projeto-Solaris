@@ -1,31 +1,43 @@
-import { obterPlantas } from '../models/plantasModel.js';
+window.Solaris = window.Solaris || {};
 
-export function makeViewModel(onStateChange) {
-  const estadoBase = {
-    termoBusca: '',
-    plantas: [],
-    carregando: false
-  };
+(function (Solaris) {
+  'use strict';
 
-  const estado = new Proxy(estadoBase, {
-    set(alvo, propriedade, valor) {
-      alvo[propriedade] = valor;
-      onStateChange(estado);
-      return true;
-    }
-  });
+  function makeCatalogoViewModel(onStateChange) {
+    const estadoBase = {
+      termoBusca: '',
+      plantas: [],
+      carregando: false
+    };
 
-  return {
-    estado,
+    const estado = new Proxy(estadoBase, {
+      set: function (alvo, propriedade, valor) {
+        alvo[propriedade] = valor;
+        onStateChange(estado);
+        return true;
+      }
+    });
 
-    async buscar(termo) {
-      estado.carregando = true;
+    let requisicaoAtual = 0;
+
+    async function buscar(termo) {
+      const minhaRequisicao = ++requisicaoAtual;
+
       estado.termoBusca = termo;
+      estado.carregando = true;
 
-      const resultados = await obterPlantas(termo);
+      const resultados = await Solaris.plantasModel.obterPlantas(termo);
+
+      if (minhaRequisicao !== requisicaoAtual) {
+        return;
+      }
 
       estado.plantas = resultados;
       estado.carregando = false;
     }
-  };
-}
+
+    return { estado: estado, buscar: buscar };
+  }
+
+  Solaris.makeCatalogoViewModel = makeCatalogoViewModel;
+})(window.Solaris);

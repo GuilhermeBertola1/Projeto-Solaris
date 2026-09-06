@@ -1,62 +1,64 @@
-import { obterJardim, regarPlanta, obterPlantaDoJardim } from '../models/jardimModel.js';
-import { calcularEstadoPlanta } from '../models/simulacaoModel.js';
+window.Solaris = window.Solaris || {};
 
-export function makeJardimViewModel(onStateChange) {
-  const estadoBase = { plantas: [] };
+(function (Solaris) {
+  'use strict';
 
-  const estado = new Proxy(estadoBase, {
-    set(alvo, propriedade, valor) {
-      alvo[propriedade] = valor;
-      onStateChange(estado);
-      return true;
-    }
-  });
-
-  function carregar() {
-    estado.plantas = obterJardim().map(planta => ({
-      ...planta,
-      ...calcularEstadoPlanta(planta)
-    }));
+  function criarEstadoReativo(estadoBase, onStateChange) {
+    const estado = new Proxy(estadoBase, {
+      set: function (alvo, propriedade, valor) {
+        alvo[propriedade] = valor;
+        onStateChange(estado);
+        return true;
+      }
+    });
+    return estado;
   }
 
-  function regar(instanceId) {
-    regarPlanta(instanceId);
+  function comEstadoCalculado(planta) {
+    return Object.assign({}, planta, Solaris.simulacaoModel.calcularEstadoPlanta(planta));
+  }
+
+  function makeJardimViewModel(onStateChange) {
+    const estado = criarEstadoReativo({ plantas: [] }, onStateChange);
+
+    function carregar() {
+      estado.plantas = Solaris.jardimModel.obterJardim().map(comEstadoCalculado);
+    }
+
+    function regar(instanceId) {
+      Solaris.jardimModel.regarPlanta(instanceId);
+      carregar();
+    }
+
     carregar();
+
+    return { estado: estado, carregar: carregar, regar: regar };
   }
 
-  carregar();
+  function makePerfilViewModel(instanceId, onStateChange) {
+    const estado = criarEstadoReativo({ planta: null, encontrada: true }, onStateChange);
 
-  return { estado, carregar, regar };
-}
+    function carregar() {
+      const planta = Solaris.jardimModel.obterPlantaDoJardim(instanceId);
 
-export function makePerfilViewModel(instanceId, onStateChange) {
-  const estadoBase = { planta: null, encontrada: true };
+      if (!planta) {
+        estado.encontrada = false;
+        return;
+      }
 
-  const estado = new Proxy(estadoBase, {
-    set(alvo, propriedade, valor) {
-      alvo[propriedade] = valor;
-      onStateChange(estado);
-      return true;
-    }
-  });
-
-  function carregar() {
-    const planta = obterPlantaDoJardim(instanceId);
-
-    if (!planta) {
-      estado.encontrada = false;
-      return;
+      estado.planta = comEstadoCalculado(planta);
     }
 
-    estado.planta = { ...planta, ...calcularEstadoPlanta(planta) };
-  }
+    function regar() {
+      Solaris.jardimModel.regarPlanta(instanceId);
+      carregar();
+    }
 
-  function regar() {
-    regarPlanta(instanceId);
     carregar();
+
+    return { estado: estado, regar: regar };
   }
 
-  carregar();
-
-  return { estado, regar };
-}
+  Solaris.makeJardimViewModel = makeJardimViewModel;
+  Solaris.makePerfilViewModel = makePerfilViewModel;
+})(window.Solaris);
