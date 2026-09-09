@@ -54,9 +54,13 @@ window.Solaris = window.Solaris || {};
       carregar();
     }
 
+    function remover() {
+      Solaris.jardimModel.removerDoJardim(instanceId);
+    }
+
     carregar();
 
-    return { estado: estado, regar: regar };
+    return { estado: estado, regar: regar, remover: remover };
   }
 
   Solaris.makeJardimViewModel = makeJardimViewModel;
