@@ -30,8 +30,12 @@ boa experiência de uso em qualquer dispositivo.
 * **Meu Jardim** — painel principal com as plantas do usuário e destaque
   automático para as que precisam de rega.
 * **Perfil e simulação** — linha do tempo com o estágio atual de desenvolvimento
-  (Brotação → Crescimento Vegetativo → Fase Adulta) e o humor da planta,
-  calculado a partir da última rega. O botão "Reguei hoje" atualiza esse estado.
+  (Brotação → Crescimento Vegetativo → Fase Adulta), barra de progresso da fase,
+  ficha de cuidados, previsão da próxima rega, histórico das últimas regas e
+  remoção com confirmação em dois passos.
+* **Orientações por espécie** — as recomendações de cada fase são geradas a
+  partir da categoria da planta, da exigência de luz e do regime de rega. Uma
+  suculenta não recebe a mesma instrução de adubação que um tomateiro.
 
 ---
 
@@ -69,10 +73,11 @@ A organização segue o padrão **MVVM**:
 js/
 ├── utils.js                    escape de HTML e debounce
 ├── models/                     dados e regras de negócio (sem DOM)
-│   ├── dados_locais.js         banco local de 100 espécies
+│   ├── dados_locais.js         banco local de 100 espécies, com categoria
 │   ├── plantasModel.js         API Perenual + fallback local
+│   ├── imagemModel.js          cópia local das fotos e fallback visual
 │   ├── jardimModel.js          persistência em localStorage
-│   └── simulacaoModel.js       regras de fase de crescimento e humor
+│   └── simulacaoModel.js       fases, humor e regime de rega por espécie
 ├── viewmodels/                 estado reativo via Proxy
 │   ├── catalogoViewModel.js
 │   └── jardimViewModel.js
@@ -91,6 +96,38 @@ js/
 
 Os `<script>` são carregados na ordem de dependência no fim do `<body>` de cada
 página.
+
+---
+
+## Decisão técnica: por que as fotos são copiadas para o localStorage
+
+A API Perenual não devolve uma URL de imagem comum. Devolve uma **URL assinada
+da AWS**, com validade declarada no próprio endereço:
+
+```
+.../thumbnail/foto.jpg?X-Amz-Signature=...&X-Amz-Expires=86400
+```
+
+São 24 horas. Depois disso o servidor responde **403** e a imagem morre. Como o
+jardim é persistido no navegador, guardar essa URL significava que toda foto
+salva quebrava no dia seguinte — foi exatamente o que aconteceu em produção.
+
+A correção não foi tratar o sintoma, e sim a premissa: **uma referência temporária
+não pode ser persistida como se fosse permanente.** No momento em que a planta
+entra no jardim, a imagem é baixada e redesenhada em um `<canvas>` no tamanho do
+card (300×225, JPEG a 72%, ~16 KB) e guardada como data URI junto dos dados.
+
+Ganhos:
+
+* o jardim funciona **offline** e não expira;
+* o "Meu Jardim" passa a ter **zero requisições a terceiros**, o que tira o LCP
+  de um servidor externo e melhora a nota de desempenho;
+* uma rede de segurança adicional troca qualquer imagem que falhe ao carregar
+  pelo placeholder local, em vez de exibir o ícone de imagem quebrada.
+
+O plano gratuito da API também devolve uma imagem genérica de "faça upgrade" no
+lugar da foto real de muitas espécies; ela é detectada e substituída pelo
+placeholder.
 
 ---
 
@@ -130,6 +167,10 @@ sistema).
   duplicar a informação já presente no texto ao lado.
 * Rótulos de link e de botão únicos, com o nome da planta em texto só para
   leitor de tela.
+* Barra de progresso com `role="progressbar"` e `aria-valuetext`, para o leitor
+  de tela anunciar "Dia 7 de 15 nesta fase" em vez de apenas um percentual.
+* Remoção de planta em dois passos inline, e não com `confirm()`: o diálogo
+  nativo trava a página e é hostil a tecnologia assistiva.
 * Contraste verificado em todos os pares de cor: mínimo de 4.89:1 para texto
   e 6.77:1 para bordas de componente (o mínimo exigido é 4.5:1 e 3:1).
 * `prefers-reduced-motion` respeitado.
@@ -154,7 +195,11 @@ Nenhuma das faixas apresenta rolagem horizontal.
 
 * Sem dependências externas, sem framework e sem build step.
 * Fonte do sistema — nenhum arquivo de fonte é baixado.
-* Imagens com `width`/`height` explícitos, o que evita deslocamento de layout (CLS).
+* Imagens com `width`/`height` explícitos e `aspect-ratio` no CSS, o que evita
+  deslocamento de layout (CLS).
+* As fotos do jardim são servidas do próprio navegador (data URI), sem conexão
+  a servidores de terceiros.
+* `preconnect` para a API e para o host das imagens na única página que os usa.
 * Os primeiros cards de cada lista carregam com `loading="eager"` e
   `fetchpriority="high"`; o restante usa `loading="lazy"`. Aplicar lazy loading
   à maior imagem visível atrasaria o LCP.
