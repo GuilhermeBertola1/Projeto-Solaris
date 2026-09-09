@@ -58,7 +58,7 @@
       return;
     }
 
-    Solaris.jardimModel.adicionarAoJardim(planta);
+    const entrada = Solaris.jardimModel.adicionarAoJardim(planta);
 
     botao.textContent = 'Adicionado';
     botao.disabled = true;
@@ -66,6 +66,12 @@
     if (feedback) {
       feedback.textContent = planta.nome + ' foi adicionada ao seu jardim.';
     }
+
+    Solaris.imagemModel.capturarComoDataUri(planta.foto).then(function (dataUri) {
+      if (dataUri) {
+        Solaris.jardimModel.atualizarFoto(entrada.instanceId, dataUri);
+      }
+    });
   });
 
   viewModel.buscar('');

@@ -18,7 +18,8 @@ window.Solaris = window.Solaris || {};
       especie: (item.scientific_name && item.scientific_name[0]) || 'Sem nome científico',
       luz: Array.isArray(item.sunlight) ? item.sunlight.join(', ') : (item.sunlight || 'Não informada'),
       dificuldade: item.watering || 'Média',
-      foto: (item.default_image && item.default_image.thumbnail) || 'assets/images/placeholder.jpg'
+      categoria: null,
+      foto: Solaris.imagemModel.normalizarFoto(item.default_image && item.default_image.thumbnail)
     };
   }
 

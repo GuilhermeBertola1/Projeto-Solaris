@@ -5,6 +5,8 @@ window.Solaris = window.Solaris || {};
 
   const CHAVE_ARMAZENAMENTO = 'solaris_meuJardim';
 
+  const TAMANHO_HISTORICO = 10;
+
   function gerarInstanceId() {
     if (window.crypto && typeof window.crypto.randomUUID === 'function') {
       return window.crypto.randomUUID();
@@ -15,8 +17,10 @@ window.Solaris = window.Solaris || {};
   function salvarJardim(jardim) {
     try {
       localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(jardim));
+      return true;
     } catch (erro) {
       console.warn('Não foi possível salvar o jardim no localStorage.', erro);
+      return false;
     }
   }
 
@@ -40,14 +44,34 @@ window.Solaris = window.Solaris || {};
       especie: planta.especie,
       luz: planta.luz,
       dificuldade: planta.dificuldade,
-      foto: planta.foto,
+      categoria: planta.categoria || null,
+      foto: Solaris.imagemModel.normalizarFoto(planta.foto),
       dataAdicionada: agora,
-      ultimaRega: agora
+      ultimaRega: agora,
+      historicoRegas: [agora]
     };
 
     jardim.push(novaEntrada);
     salvarJardim(jardim);
     return novaEntrada;
+  }
+
+  function atualizarFoto(instanceId, foto) {
+    if (!foto) {
+      return null;
+    }
+
+    const jardim = obterJardim().map(function (planta) {
+      if (planta.instanceId !== instanceId) {
+        return planta;
+      }
+      return Object.assign({}, planta, { foto: foto });
+    });
+
+    if (!salvarJardim(jardim)) {
+      return null;
+    }
+    return obterPlantaDoJardim(instanceId);
   }
 
   function obterPlantaDoJardim(instanceId) {
@@ -58,11 +82,19 @@ window.Solaris = window.Solaris || {};
   }
 
   function regarPlanta(instanceId) {
+    const agora = Date.now();
+
     const jardim = obterJardim().map(function (planta) {
       if (planta.instanceId !== instanceId) {
         return planta;
       }
-      return Object.assign({}, planta, { ultimaRega: Date.now() });
+
+      const historico = (planta.historicoRegas || []).concat(agora);
+
+      return Object.assign({}, planta, {
+        ultimaRega: agora,
+        historicoRegas: historico.slice(-TAMANHO_HISTORICO)
+      });
     });
 
     salvarJardim(jardim);
@@ -79,6 +111,7 @@ window.Solaris = window.Solaris || {};
   Solaris.jardimModel = {
     obterJardim: obterJardim,
     adicionarAoJardim: adicionarAoJardim,
+    atualizarFoto: atualizarFoto,
     obterPlantaDoJardim: obterPlantaDoJardim,
     regarPlanta: regarPlanta,
     removerDoJardim: removerDoJardim
