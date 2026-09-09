@@ -29,9 +29,15 @@ window.Solaris = window.Solaris || {};
       ? 'loading="eager" fetchpriority="high"'
       : 'loading="lazy"';
 
-    const corpo = config.mostrarHumor
-      ? blocoHumor(planta.humor, false)
-      : '<p>Luz: ' + esc(planta.luz) + ' | Dificuldade: ' + esc(planta.dificuldade) + '</p>';
+    let corpo;
+    if (config.mostrarHumor) {
+      const rega = Solaris.simulacaoModel.descreverProximaRega(planta);
+      corpo = blocoHumor(planta.humor, false) +
+        '<p class="card-rega' + (rega.atrasada ? ' destaque-atencao' : '') + '">' +
+        esc(rega.texto) + '</p>';
+    } else {
+      corpo = '<p>Luz: ' + esc(planta.luz) + ' | Dificuldade: ' + esc(planta.dificuldade) + '</p>';
+    }
 
     const nomeParaLeitor = '<span class="visualmente-oculto"> — ' + esc(planta.nome) + '</span>';
 
@@ -45,7 +51,8 @@ window.Solaris = window.Solaris || {};
       '<article class="card-planta">' +
         '<figure>' +
           '<img src="' + esc(planta.foto) + '" alt="' + esc(planta.nome) + '" ' +
-          'width="250" height="200" ' + atributosImagem + '>' +
+          'width="' + Solaris.imagemModel.LARGURA + '" height="' + Solaris.imagemModel.ALTURA + '" ' +
+          atributosImagem + '>' +
           '<figcaption>' + esc(planta.especie) + '</figcaption>' +
         '</figure>' +
         '<h3>' + esc(planta.nome) + '</h3>' +

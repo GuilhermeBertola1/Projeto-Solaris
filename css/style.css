@@ -1,3 +1,18 @@
+/* =========================================================================
+   Projeto Solaris — folha de estilo única
+   Organização do arquivo:
+     1. Tokens de design (:root)
+     2. Reset e base
+     3. Utilitários de acessibilidade
+     4. Cabeçalho e navegação
+     5. Layout principal e tipografia
+     6. Componentes: botão, card, painel de dica, formulário
+     7. Página de perfil e simulação
+     8. Rodapé
+     9. Responsividade (tablet e celular)
+   ========================================================================= */
+
+/* ---------- 1. Tokens de design ---------- */
 :root {
   /* Paleta principal — 6 cores.
      Todas as demais cores do projeto são variações claras destas. */
@@ -57,6 +72,7 @@ body {
   min-height: 100vh;
 }
 
+/* Respeita quem configurou o sistema para reduzir animações */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -71,6 +87,8 @@ body {
 }
 
 /* ---------- 3. Utilitários de acessibilidade ---------- */
+
+/* Contorno de foco visível em todo elemento interativo */
 :focus-visible {
   outline: 3px solid var(--cor-secundaria);
   outline-offset: 3px;
@@ -89,6 +107,7 @@ body {
   border: 0;
 }
 
+/* Link de atalho: fica escondido até receber foco pelo teclado */
 .link-pular {
   position: absolute;
   left: 0.5rem;
@@ -129,11 +148,14 @@ nav a {
   color: var(--cor-texto-suave);
   font-weight: 600;
   font-size: 1.05rem;
+  /* Padding vertical dimensionado para uma área de toque de ~46px */
   padding: 0.65rem 1rem;
   border-radius: var(--raio-sm);
   transition: background-color 0.2s, color 0.2s;
 }
 
+/* Fundo claro no hover: o par verde-escuro sobre verde-escuro usado antes
+   ficava em 1.53:1 e tornava o texto ilegível. Este par dá 7.0:1. */
 nav a:hover {
   color: var(--cor-secundaria);
   background-color: var(--cor-primaria-clara);
@@ -207,6 +229,32 @@ p {
   cursor: default;
 }
 
+/* Variante secundária: mesma forma, peso visual menor */
+.botao--secundario {
+  background-color: transparent;
+  color: var(--cor-secundaria);
+  border: 2px solid var(--cor-secundaria);
+  padding: calc(0.65rem - 2px) calc(1.2rem - 2px);
+}
+
+.botao--secundario:hover {
+  background-color: var(--cor-primaria-clara);
+}
+
+/* Variante destrutiva: contorno em âmbar escuro, para não competir com a
+   ação principal da página nem sugerir que é o caminho esperado */
+.botao--perigo {
+  background-color: transparent;
+  color: var(--cor-destaque);
+  border: 2px solid var(--cor-destaque);
+  padding: calc(0.65rem - 2px) calc(1.2rem - 2px);
+}
+
+.botao--perigo:hover {
+  background-color: var(--cor-destaque-clara);
+  color: var(--cor-destaque);
+}
+
 /* Dentro do card, a ação é empurrada para a base para alinhar os cards */
 .card-planta .botao {
   margin-top: auto;
@@ -246,12 +294,34 @@ p {
   text-align: center;
 }
 
+/* As miniaturas da API têm 200x200. Antes elas eram esticadas para uma faixa
+   de ~395x180: ampliavam 2x (ficando borradas) e perdiam topo e base no
+   recorte. Limitar a largura e usar proporção 4:3 mantém a planta inteira
+   visível e evita a ampliação exagerada. */
 .card-planta figure img {
+  display: block;
   width: 100%;
-  height: 180px;
+  max-width: 300px;
+  /* height: auto é obrigatório aqui: o atributo height="225" do HTML vira uma
+     altura fixa na folha de estilo do navegador e venceria o aspect-ratio. */
+  height: auto;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
+  object-position: center;
   border-radius: var(--raio-sm);
   background-color: var(--cor-borda);
+}
+
+/* Aviso de rega no card do jardim */
+.card-rega {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.destaque-atencao {
+  color: var(--cor-destaque);
+  font-weight: 700;
 }
 
 .card-planta figcaption {
@@ -347,7 +417,8 @@ p {
 
 /* ---------- 7. Perfil da planta e simulação ---------- */
 .secao-info-basica,
-.secao-simulacao {
+.secao-simulacao,
+.secao-historico {
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-md);
@@ -356,44 +427,124 @@ p {
   box-shadow: var(--sombra-card);
 }
 
+/* Mesma proporção do card. O limite de 300px casa com a largura em que a cópia
+   local é gravada (imagemModel.LARGURA), então a foto do jardim aparece em
+   escala 1:1, sem ampliação e sem perder nitidez. */
 .secao-info-basica figure img {
+  display: block;
   width: 100%;
-  max-width: 400px;
+  max-width: 300px;
   height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
   border-radius: var(--raio-sm);
   background-color: var(--cor-borda);
 }
 
-.secao-info-basica ul {
+/* Ficha de cuidados: rótulo em cima, valor embaixo, em grade fluida */
+.ficha-cuidados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.ficha-cuidados div {
+  padding: 0.75rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-sm);
+}
+
+.ficha-cuidados dt {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cor-texto-suave);
+  margin-bottom: 0.2rem;
+}
+
+.ficha-cuidados dd {
+  font-weight: 600;
+}
+
+/* Barra de progresso da fase atual */
+.progresso {
+  margin: 1.25rem 0;
+}
+
+.progresso-rotulo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+  margin-bottom: 0.4rem;
+}
+
+.progresso-trilho {
+  height: 12px;
+  background-color: var(--cor-borda);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progresso-preenchimento {
+  height: 100%;
+  background-color: var(--cor-primaria);
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+
+/* Linha do tempo das fases */
+.linha-do-tempo {
   list-style: none;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
-.secao-info-basica li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--cor-borda);
-}
-
-.secao-simulacao ol {
-  list-style: none;
-  margin-top: 1rem;
-}
-
-.secao-simulacao ol li {
+.linha-do-tempo li {
   padding: 0.9rem 1rem;
   margin-bottom: 0.75rem;
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-sm);
 }
 
-.secao-simulacao ol li p {
+.linha-do-tempo li p {
   max-width: var(--medida-texto);
   margin-bottom: 0;
 }
 
-.secao-simulacao ol li.fase-atual {
+.linha-do-tempo li.fase-atual {
   background-color: var(--cor-primaria-clara);
   border-left: 4px solid var(--cor-primaria);
+}
+
+/* Histórico de regas e remoção */
+.historico-regas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 1rem 0 1.5rem;
+}
+
+.historico-regas li {
+  padding: 0.35rem 0.75rem;
+  background-color: var(--cor-primaria-clara);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.aviso-remocao {
+  max-width: var(--medida-texto);
+  font-weight: 600;
+}
+
+.acoes-remocao {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 /* Estado emocional da planta */
