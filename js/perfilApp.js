@@ -1,3 +1,7 @@
+/**
+ * View do perfil da planta (perfil.html).
+ * A planta é identificada pelo parâmetro ?id= da URL.
+ */
 (function (Solaris) {
   'use strict';
 
@@ -13,8 +17,12 @@
 
   let viewModel = null;
 
+  // O botão "Reguei hoje" é recriado a cada render; esta flag devolve o foco
+  // do teclado para ele, para quem navega sem mouse não perder a posição.
   let devolverFocoAoBotao = false;
 
+  // Remover é destrutivo, então exige dois cliques. Preferimos este estado
+  // inline a um confirm(), que trava a página e é hostil a leitor de tela.
   let confirmandoRemocao = false;
 
   const FORMATO_DATA = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -24,6 +32,11 @@
       ' <a href="index.html">Voltar para Meu Jardim</a></p>';
   }
 
+  /**
+   * Barra de progresso da fase atual.
+   * Usa role="progressbar" com aria-valuetext para que o leitor de tela anuncie
+   * "dia 7 de 15" em vez de apenas o número percentual.
+   */
   function barraDeProgresso(planta) {
     const p = planta.progresso;
 
@@ -37,7 +50,10 @@
           '<span>' + esc(simulacao.LIMITES_FASE[planta.fase].rotulo) + '</span>' +
           '<span>' + esc(texto) + '</span>' +
         '</div>' +
+        // aria-label dá o nome acessível da barra; aria-valuetext substitui a
+        // leitura do percentual por "Dia 7 de 15 nesta fase".
         '<div class="progresso-trilho" role="progressbar" ' +
+          'aria-label="Progresso da fase de crescimento" ' +
           'aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + p.percentual + '" ' +
           'aria-valuetext="' + esc(texto) + '">' +
           '<div class="progresso-preenchimento" style="width:' + p.percentual + '%"></div>' +
@@ -45,6 +61,10 @@
       '</div>';
   }
 
+  /**
+   * Ficha de cuidados: os dados que o usuário consulta com mais frequência,
+   * em lista de definição em vez de lista solta.
+   */
   function fichaDeCuidados(planta) {
     const rega = simulacao.descreverProximaRega(planta);
 
@@ -61,6 +81,9 @@
       '</dl>';
   }
 
+  /**
+   * Últimas regas registradas, da mais recente para a mais antiga.
+   */
   function historicoDeRegas(planta) {
     const historico = (planta.historicoRegas || []).slice().reverse();
 
@@ -75,6 +98,9 @@
     return '<ol class="historico-regas">' + itens + '</ol>';
   }
 
+  /**
+   * Linha do tempo das três fases, com o texto específico desta planta.
+   */
   function listaDeFases(planta) {
     return simulacao.ORDEM_FASES.map(function (chave) {
       const info = simulacao.descreverFase(chave, planta);
@@ -121,6 +147,8 @@
       '<section class="secao-info-basica">' +
         '<h2>Ficha da planta</h2>' +
         '<figure>' +
+          // Maior imagem da página e candidata a LCP: carrega com prioridade.
+          // As dimensões batem com as da cópia local, para exibir em escala 1:1.
           '<img src="' + esc(planta.foto) + '" alt="' + esc(planta.nome) + '" ' +
           'width="' + Solaris.imagemModel.LARGURA + '" height="' + Solaris.imagemModel.ALTURA + '" ' +
           'loading="eager" fetchpriority="high">' +
@@ -146,6 +174,9 @@
     ligarAcoes(planta, humor);
   }
 
+  /**
+   * Conecta os listeners aos botões recriados no render.
+   */
   function ligarAcoes(planta, humor) {
     const botaoRegar = document.getElementById('btn-regar');
 
@@ -153,6 +184,8 @@
       devolverFocoAoBotao = true;
       viewModel.regar();
 
+      // regar() re-renderiza de forma síncrona, então aqui o estado já está
+      // atualizado — a mensagem descreve o humor novo, não o anterior.
       if (elFeedback && viewModel.estado.planta) {
         const novo = simulacao.HUMOR_INFO[viewModel.estado.planta.humor];
         const proxima = simulacao.descreverProximaRega(viewModel.estado.planta);
@@ -204,4 +237,7 @@
   } else {
     viewModel = Solaris.makePerfilViewModel(instanceId, renderizar);
   }
+
+  // Conteúdo montado: pode mostrar a página, sem salto de layout.
+  Solaris.utils.revelarPagina();
 })(window.Solaris);

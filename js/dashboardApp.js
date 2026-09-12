@@ -1,9 +1,14 @@
+/**
+ * View do painel "Meu Jardim" (index.html).
+ * Lê o estado do ViewModel e escreve o HTML dos cards no DOM.
+ */
 (function (Solaris) {
   'use strict';
 
   const containerAtencao = document.getElementById('container-atencao');
   const containerTodas = document.getElementById('container-todas');
 
+  // Quantos cards carregam a imagem com prioridade alta (primeira dobra).
   const CARDS_PRIORITARIOS = 3;
 
   function listaDeCards(plantas) {
@@ -32,4 +37,7 @@
   }
 
   Solaris.makeJardimViewModel(renderizarJardim);
+
+  // Cards já estão no DOM: pode mostrar a página, sem salto de layout.
+  Solaris.utils.revelarPagina();
 })(window.Solaris);

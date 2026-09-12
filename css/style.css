@@ -94,6 +94,15 @@ body {
   outline-offset: 3px;
 }
 
+/* Conteúdo escondido enquanto o JavaScript monta os cards.
+   Ver o comentário no <head> das páginas: é o que impede o salto de layout.
+   O rodapé entra junto porque é empurrado para baixo quando o <main> cresce —
+   sozinho ele ainda respondia por um CLS de 0,10. */
+.js-montando main,
+.js-montando footer {
+  visibility: hidden;
+}
+
 /* Conteúdo exclusivo para leitores de tela */
 .visualmente-oculto {
   position: absolute;
@@ -335,6 +344,18 @@ p {
   font-size: 0.95rem;
   color: var(--cor-texto-suave);
   margin-bottom: 1rem;
+}
+
+/* O catálogo depende da API, então na primeira pintura este container ainda
+   está vazio. Reservar uma tela de altura impede que o rodapé salte quando os
+   resultados chegam — era um CLS de 0,10. A classe .pronto libera a altura
+   assim que os cards ocupam o espaço de verdade. */
+#container-resultados {
+  min-height: 100vh;
+}
+
+#container-resultados.pronto {
+  min-height: 0;
 }
 
 /* Mensagens de status: carregando, sem resultado, jardim vazio */

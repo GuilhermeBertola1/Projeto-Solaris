@@ -7,6 +7,18 @@
     <title>Meu Jardim - Projeto Solaris</title>
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="css/style.css">
+    <!-- Evita o salto de layout (CLS). Sem isto o navegador pinta a pagina com
+         os containers ainda vazios e tudo abaixo salta quando o JS injeta os
+         cards — um CLS de 0,53. Escondendo o conteudo ate a montagem, os cards
+         aparecem ja na posicao final. O tempo-limite garante que a pagina
+         apareca mesmo se algum script falhar, e quem esta sem JavaScript nunca
+         recebe a classe. -->
+    <script>
+      document.documentElement.classList.add('js-montando');
+      setTimeout(function () {
+        document.documentElement.classList.remove('js-montando');
+      }, 2000);
+    </script>
   </head>
   <body>
     <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
@@ -48,6 +60,8 @@
       <p>Projeto desenvolvido para a disciplina SCOM.</p>
     </footer>
 
+    <!-- Scripts clássicos carregados na ordem de dependência.
+         Sem ES Modules, o projeto abre direto por file:// sem servidor. -->
     <script src="js/utils.js"></script>
     <script src="js/models/imagemModel.js"></script>
     <script src="js/models/simulacaoModel.js"></script>

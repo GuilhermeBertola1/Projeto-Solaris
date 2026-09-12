@@ -6,6 +6,9 @@
     <meta name="description" content="Catálogo de plantas do Projeto Solaris: pesquise espécies por nome popular ou científico e adicione as que quiser cultivar ao seu jardim virtual.">
     <title>Catálogo de plantas - Projeto Solaris</title>
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <!-- Esta é a única página que consulta a API. Abrir a conexão com os dois
+         hosts em paralelo com o CSS adianta o DNS e o TLS, encurtando o LCP.
+         O segundo host é o S3 de onde vêm as imagens das espécies. -->
     <link rel="preconnect" href="https://perenual.com" crossorigin>
     <link rel="preconnect" href="https://s3.us-central-1.wasabisys.com" crossorigin>
     <link rel="stylesheet" href="css/style.css">
@@ -34,6 +37,8 @@
         </form>
       </section>
 
+      <!-- Região viva: anuncia a leitores de tela quando uma planta é
+           adicionada ao jardim, sem precisar de alert(). -->
       <p id="feedback-jardim" class="visualmente-oculto" aria-live="polite"></p>
 
       <section class="secao-resultados">
@@ -51,6 +56,8 @@
       <p>Projeto desenvolvido para a disciplina SCOM.</p>
     </footer>
 
+    <!-- Scripts clássicos carregados na ordem de dependência.
+         Sem ES Modules, o projeto abre direto por file:// sem servidor. -->
     <script src="js/utils.js"></script>
     <script src="js/models/imagemModel.js"></script>
     <script src="js/models/dados_locais.js"></script>
