@@ -7,6 +7,13 @@ intuitiva.
 O projeto tem foco estrito em engenharia de interface: semântica web,
 responsividade, acessibilidade e desempenho.
 
+**Site publicado:** <https://guilhermebertola1.github.io/Projeto-Solaris/>
+**Repositório:** <https://github.com/GuilhermeBertola1/Projeto-Solaris>
+
+> Trabalho Individual I — Sistemas para Comunicação (SCOM), UNESP Sorocaba.
+> Autor: Guilherme Fontes Bertola (RA 241270596).
+> Prof. Leopoldo André Dutra Lusquino Filho.
+
 ---
 
 ## Objetivo do projeto
@@ -44,10 +51,15 @@ boa experiência de uso em qualquer dispositivo.
 O projeto é um protótipo front-end estático: **não precisa de servidor, Node.js,
 build step ou banco de dados.**
 
+A forma mais rápida de ver o projeto rodando é abrir o site publicado:
+<https://guilhermebertola1.github.io/Projeto-Solaris/>
+
+Para rodar localmente:
+
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/SEU_USUARIO/Projeto-Solaris.git
+   git clone https://github.com/GuilhermeBertola1/Projeto-Solaris.git
    ```
 
 2. Abra o arquivo `index.html` diretamente em um navegador moderno
@@ -64,6 +76,24 @@ build step ou banco de dados.**
 
 ---
 
+## Estrutura do repositório
+
+```
+Projeto-Solaris/
+├── index.html               Meu Jardim (painel principal)
+├── catalogo.html            busca e adição de plantas
+├── perfil.html              perfil e simulação de uma planta
+├── css/
+│   └── style.css            folha de estilo única, com design tokens
+├── js/                      ver a seção "Arquitetura"
+├── assets/images/           fotos do banco local e placeholder
+├── evidencias/              histórico de commits (git-log.txt)
+└── .github/workflows/
+    └── deploy-pages.yml     publicação automática no GitHub Pages
+```
+
+---
+
 ## Arquitetura
 
 Construído sem frameworks, para priorizar o domínio dos fundamentos da web.
@@ -71,7 +101,7 @@ A organização segue o padrão **MVVM**:
 
 ```
 js/
-├── utils.js                    escape de HTML e debounce
+├── utils.js                    escape de HTML, debounce e exibição da página
 ├── models/                     dados e regras de negócio (sem DOM)
 │   ├── dados_locais.js         banco local de 100 espécies, com categoria
 │   ├── plantasModel.js         API Perenual + fallback local
@@ -175,6 +205,8 @@ sistema).
   e 6.77:1 para bordas de componente (o mínimo exigido é 4.5:1 e 3:1).
 * `prefers-reduced-motion` respeitado.
 
+Resultado: **100/100 em Acessibilidade no Lighthouse nas três páginas.**
+
 ---
 
 ## Responsividade
@@ -205,6 +237,40 @@ Nenhuma das faixas apresenta rolagem horizontal.
   à maior imagem visível atrasaria o LCP.
 * A busca do catálogo usa debounce de 300ms, para não disparar uma requisição
   por tecla digitada.
+* O conteúdo só é exibido depois de montado (classe `js-montando`, com timeout de
+  segurança), o que zerou o CLS de 0,533 para 0.
+
+---
+
+## Resultados das auditorias
+
+Lighthouse (Chrome DevTools, **modo mobile**, site publicado no GitHub Pages):
+
+| Página         | Desempenho | Acessibilidade | Boas práticas | SEO |
+|----------------|------------|----------------|---------------|-----|
+| `index.html`   | 99         | 100            | 100           | 100 |
+| `catalogo.html`| 94         | 100            | 100           | 100 |
+| `perfil.html`  | 98         | 100            | 100           | 100 |
+
+Nas três páginas: **CLS 0**, LCP máximo de 2,1s e TBT máximo de 80ms.
+
+Validação de código:
+
+| Ferramenta                        | Resultado            |
+|-----------------------------------|----------------------|
+| W3C Nu HTML Checker (3 páginas)   | 0 erros, 0 avisos    |
+| W3C CSS Validator (CSS 3 + SVG)   | 0 erros              |
+
+Compatibilidade verificada manualmente (Windows 11 25H2):
+
+| Navegador | Versão           | Resultado |
+|-----------|------------------|-----------|
+| Chrome    | 153.0.8010.53    | ok        |
+| Firefox   | 156.0            | ok        |
+| Edge      | 153.0.4234.48    | ok        |
+
+As capturas de tela dessas auditorias estão no Apêndice B do relatório do
+trabalho, e o histórico de commits em `evidencias/git-log.txt`.
 
 ---
 
@@ -217,6 +283,26 @@ Isso significa que:
 * limpar os dados do navegador apaga o jardim salvo;
 * não há sincronização entre dispositivos — fora do escopo deste trabalho, que
   é um protótipo front-end estático sem backend.
+
+---
+
+## Publicação
+
+O site é publicado automaticamente pelo GitHub Pages através do workflow
+`.github/workflows/deploy-pages.yml`. A cada `git push` na branch `main`, o
+GitHub Actions republica a pasta do projeto — não há etapa manual de deploy.
+
+---
+
+## Versionamento
+
+O histórico segue o padrão **Conventional Commits**, com os prefixos `feat`,
+`fix`, `refactor`, `perf`, `style`, `docs` e `chore`. O log completo está em
+`evidencias/git-log.txt`, gerado com:
+
+```bash
+git log --oneline --graph
+```
 
 ---
 
@@ -258,3 +344,12 @@ Isso significa que:
   padronizada.
 * A simulação de crescimento é idealizada: usa apenas o tempo desde a adição, sem
   considerar clima, substrato ou condições reais de cultivo.
+
+---
+
+## Uso de inteligência artificial
+
+Ferramentas de IA (Claude e Gemini) foram usadas como apoio no desenho da
+arquitetura MVVM, na revisão de acessibilidade e na investigação dos problemas de
+desempenho. Todo o código foi revisado, testado e validado pelo autor. A
+declaração detalhada está na Seção 11 do relatório do trabalho.
