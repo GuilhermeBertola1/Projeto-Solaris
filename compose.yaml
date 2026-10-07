@@ -1,0 +1,34 @@
+name: solaris
+
+services:
+
+  MYSQL:
+    image: docker.io/library/mysql:8.4
+    container_name: solaris-MYSQL
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_SENHA:?defina DB_ROOT_SENHA no .env}
+      MYSQL_DATABASE: solaris
+      MYSQL_USER: ${DB_USUARIO:?defina DB_USUARIO no .env}
+      MYSQL_PASSWORD: ${DB_SENHA:?defina DB_SENHA no .env}
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    
+    ports:
+      - "127.0.0.1:3306:3306"
+    
+    volumes:
+      - dados-mysql:/var/lib/mysql
+    
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  dados-mysql:
