@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 @Table(name = "categoria")
 public class Categoria {
     @Id
-    @Column(name = "Id", columnDefinition = "TINYINT UNSIGNED")
+    @Column(name = "id", columnDefinition = "TINYINT UNSIGNED")
     private Short id;
 
     @Column(name = "codigo", nullable = false, length = 20)
