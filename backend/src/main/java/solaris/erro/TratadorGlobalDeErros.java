@@ -12,12 +12,14 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.security.web.csrf.CsrfException;
 
 @RestControllerAdvice
 public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
@@ -58,6 +60,18 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getSegundosParaLiberar()))
                 .body(corpo);
+    }
+
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    public ProblemDetail loginNecessario(InsufficientAuthenticationException ex) {
+        return problema(HttpStatus.UNAUTHORIZED, "Login necessário",
+                "Faça login para acessar este recurso.");
+    }
+
+    @ExceptionHandler(CsrfException.class)
+    public ProblemDetail csrfInvalido(CsrfException ex) {
+        return problema(HttpStatus.FORBIDDEN, "Token CSRF inválido",
+                "Token CSRF ausente ou inválido. Recarregue a página e tente novamente.");
     }
 
     @Override

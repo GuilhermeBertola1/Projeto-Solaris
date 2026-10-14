@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -27,7 +26,8 @@ public class SegurancaConfig {
 
     @Bean
     public SecurityFilterChain filtroDeSeguranca(HttpSecurity http,
-            SecurityContextRepository repositorioDeContexto) throws Exception {
+            SecurityContextRepository repositorioDeContexto,
+            DelegadorDeErrosDeSeguranca errosDeSeguranca) throws Exception {
         http
             .authorizeHttpRequests(regras -> regras
                 .requestMatchers(HttpMethod.GET, "/api/especies/**").permitAll()
@@ -46,7 +46,8 @@ public class SegurancaConfig {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 .deleteCookies("JSESSIONID"))
             .exceptionHandling(erros -> erros
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .authenticationEntryPoint(errosDeSeguranca)
+                .accessDeniedHandler(errosDeSeguranca))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
 
