@@ -6,12 +6,19 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -19,7 +26,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 public class SegurancaConfig {
 
     @Bean
-    public SecurityFilterChain filtroDeSeguranca(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filtroDeSeguranca(HttpSecurity http,
+            SecurityContextRepository repositorioDeContexto) throws Exception {
         http
             .authorizeHttpRequests(regras -> regras
                 .requestMatchers(HttpMethod.GET, "/api/especies/**").permitAll()
@@ -31,12 +39,31 @@ public class SegurancaConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+            .securityContext(contexto -> contexto
+                .securityContextRepository(repositorioDeContexto))
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
+                .deleteCookies("JSESSIONID"))
             .exceptionHandling(erros -> erros
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
+    }
+
+    @Bean
+    public SecurityContextRepository repositorioDeContexto() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService usuarioDetailsService,
+                                                       PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provedor = new DaoAuthenticationProvider(usuarioDetailsService);
+        provedor.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(provedor);
     }
 
     @Bean
