@@ -1,0 +1,79 @@
+@base = http://localhost:8080
+
+### 1. Catálogo público, sem login → 200
+GET {{base}}/api/especies?pagina=0&tamanho=3
+
+### 2. Rota protegida sem login → 401
+GET {{base}}/api/auth/eu
+
+### 3. Pegar o token CSRF → 200
+# @name csrf
+GET {{base}}/api/auth/csrf
+
+### 4. POST sem token CSRF → 403
+POST {{base}}/api/auth/cadastro
+Content-Type: application/json
+
+{"nome": "Ana Teste", "email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### 5. Cadastro com dados inválidos → 400 com "campos"
+POST {{base}}/api/auth/cadastro
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nome": "A", "email": "ana@teste", "senha": "123"}
+
+### 6. Cadastro válido → 201
+POST {{base}}/api/auth/cadastro
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nome": "Ana Teste", "email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### 7. Mesmo e-mail de novo → 409
+POST {{base}}/api/auth/cadastro
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nome": "Outra Ana", "email": "ANA@teste.com", "senha": "outra-senha-123"}
+
+### 8. Login com senha errada → 401
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-errada"}
+
+### 9. Login correto → 200
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### 10. Quem sou eu, agora logado → 200
+GET {{base}}/api/auth/eu
+
+### 11. Rota de admin com usuário comum → 403
+GET {{base}}/api/admin/qualquer
+
+### 12. Logout → 204
+POST {{base}}/api/auth/logout
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+### 13. Depois do logout → 401
+GET {{base}}/api/auth/eu
+
+### 14. Força bruta: rode este 6 vezes seguidas → as 5 primeiras dão 401, a 6ª dá 429
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "chute-errado"}
+
+### 15. Logo depois, a senha CERTA também é bloqueada → 429
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-da-ana-1"}
