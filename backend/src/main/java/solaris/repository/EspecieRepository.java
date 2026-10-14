@@ -16,4 +16,11 @@ public interface EspecieRepository extends JpaRepository<Especie, Integer> {
 
     @EntityGraph(attributePaths = {"categoria", "nivelLuz", "regimeRega"})
     Optional<Especie> findByIdAndAtivoTrue(Integer id);
+
+    @Override
+    @EntityGraph(attributePaths = {"categoria", "nivelLuz", "regimeRega"})
+    Page<Especie> findAll(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"categoria", "nivelLuz", "regimeRega"})
+    Optional<Especie> findComRelacoesById(Integer id);
 }

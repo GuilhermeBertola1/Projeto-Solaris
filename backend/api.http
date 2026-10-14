@@ -199,3 +199,68 @@ X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 ### 37. Regar sem token CSRF → 403
 POST {{base}}/api/plantas/{{plantaParaRegar.response.body.$.id}}/regas
+
+### ===================== ADMIN: ESPÉCIES =====================
+### Antes: teste 3 (token). Ambiente "local" ativo (Ctrl+Alt+E)
+
+### 38. Login do admin → 200, "perfil": "ADMIN"
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "{{adminEmail}}", "senha": "{{adminSenha}}"}
+
+### 39. Listar todas as espécies (com "ativo" e ids) → 200
+GET {{base}}/api/admin/especies?tamanho=5
+
+### 40. Cadastrar espécie → 201
+# @name novaEspecie
+POST {{base}}/api/admin/especies
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nomePopular": "Hortelã-pimenta", "nomeCientifico": "Mentha piperita", "categoriaId": 1, "nivelLuzId": 2, "regimeRegaId": 1, "dificuldade": "FACIL", "fotoUrl": "assets/images/placeholder.jpg"}
+
+### 41. Dados inválidos, incluindo foto "javascript:" → 400 com "campos"
+POST {{base}}/api/admin/especies
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nomePopular": "", "categoriaId": 1, "regimeRegaId": 1, "dificuldade": "FACIL", "fotoUrl": "javascript:alert(1)"}
+
+### 42. Editar → 200
+PUT {{base}}/api/admin/especies/{{novaEspecie.response.body.$.id}}
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nomePopular": "Hortelã-pimenta", "nomeCientifico": "Mentha × piperita", "categoriaId": 1, "nivelLuzId": 2, "regimeRegaId": 2, "dificuldade": "MEDIA", "fotoUrl": null}
+
+### 43. Desativar → 200, "ativo": false
+PATCH {{base}}/api/admin/especies/{{novaEspecie.response.body.$.id}}/ativo
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"ativo": false}
+
+### 44. No catálogo PÚBLICO ela sumiu → 404
+GET {{base}}/api/especies/{{novaEspecie.response.body.$.id}}
+
+### 45. Reativar → 200, "ativo": true
+PATCH {{base}}/api/admin/especies/{{novaEspecie.response.body.$.id}}/ativo
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"ativo": true}
+
+### 46. No catálogo público voltou → 200
+GET {{base}}/api/especies/{{novaEspecie.response.body.$.id}}
+
+### 47. Login da Ana (USUARIO) e tentativa de usar rota de admin → 403
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### 48. USUARIO comum em rota de admin → 403 "Acesso negado"
+GET {{base}}/api/admin/especies
