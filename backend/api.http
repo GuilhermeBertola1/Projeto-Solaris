@@ -77,3 +77,100 @@ Content-Type: application/json
 X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 {"email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### ===================== JARDIM =====================
+### Antes: rode o teste 3 (token CSRF) e o 9 (login da Ana)
+
+### 16. Plantar → 201, já com estado "FELIZ"
+# @name plantaDaAna
+POST {{base}}/api/plantas
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"especieId": 2, "apelido": "Manjericão da janela", "dataPlantio": "2026-10-01"}
+
+### 17. Dados inválidos (data futura, apelido longo, sem espécie) → 400 com "campos"
+POST {{base}}/api/plantas
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"apelido": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "dataPlantio": "2099-01-01"}
+
+### 18. Espécie inexistente → 404
+POST {{base}}/api/plantas
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"especieId": 9999, "dataPlantio": "2026-10-01"}
+
+### 19. Apelido com HTML é guardado como TEXTO, não executado → 201
+POST {{base}}/api/plantas
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"especieId": 21, "apelido": "<script>alert('xss')</script>", "dataPlantio": "2026-09-01"}
+
+### 20. Meu jardim → 200
+GET {{base}}/api/plantas
+
+### 21. Uma planta minha → 200
+GET {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+
+### 22. Editar → 200
+PUT {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"apelido": "Manjericão do Solaris", "dataPlantio": "2026-09-20"}
+
+### ---------- Outro usuário tentando mexer na planta da Ana ----------
+
+### 23. Cadastrar o Bruno → 201 (ou 409 se já existir)
+POST {{base}}/api/auth/cadastro
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"nome": "Bruno Teste", "email": "bruno@teste.com", "senha": "senha-do-bruno-1"}
+
+### 24. Login do Bruno → 200
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "bruno@teste.com", "senha": "senha-do-bruno-1"}
+
+### 25. Bruno tenta VER a planta da Ana → 404
+GET {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+
+### 26. Bruno tenta EDITAR a planta da Ana → 404
+PUT {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"apelido": "roubada", "dataPlantio": "2026-10-01"}
+
+### 27. Bruno tenta APAGAR a planta da Ana → 404
+DELETE {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+### 28. O jardim do Bruno está vazio → 200 com "itens": []
+GET {{base}}/api/plantas
+
+### ---------- De volta à Ana ----------
+
+### 29. Login da Ana de novo → 200
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-da-ana-1"}
+
+### 30. A planta continua intacta (apelido "Manjericão do Solaris") → 200
+GET {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+
+### 31. Ana apaga a própria planta → 204
+DELETE {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+### 32. Depois de apagada → 404
+GET {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
