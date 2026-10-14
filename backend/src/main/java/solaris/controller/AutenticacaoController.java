@@ -27,6 +27,7 @@ import solaris.dto.CadastroRequisicao;
 import solaris.dto.LoginRequisicao;
 import solaris.dto.UsuarioResposta;
 import solaris.service.AutenticacaoService;
+import solaris.seguranca.LimitadorDeLogin;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -37,13 +38,16 @@ public class AutenticacaoController {
     private final AutenticacaoService service;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository repositorioDeContexto;
+    private final LimitadorDeLogin limitador;
 
     public AutenticacaoController(AutenticacaoService service,
                                   AuthenticationManager authenticationManager,
-                                  SecurityContextRepository repositorioDeContexto) {
+                                  SecurityContextRepository repositorioDeContexto,
+                                  LimitadorDeLogin limitador) {
         this.service = service;
         this.authenticationManager = authenticationManager;
         this.repositorioDeContexto = repositorioDeContexto;
+        this.limitador = limitador;
     }
 
     @GetMapping("/csrf")
@@ -62,15 +66,21 @@ public class AutenticacaoController {
     @PostMapping("/login")
     public UsuarioResposta login(@Valid @RequestBody LoginRequisicao requisicao,
                                  HttpServletRequest request, HttpServletResponse response) {
+        String ip = request.getRemoteAddr();
+        limitador.verificar(ip);
+
         Authentication autenticacao;
         try {
             autenticacao = authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken.unauthenticated(
                             requisicao.email(), requisicao.senha()));
         } catch (AuthenticationException ex) {
-            log.warn("Falha de login para {}", requisicao.email());
+            limitador.registrarFalha(ip);
+            log.warn("Falha de login para {} a partir do IP {}", requisicao.email(), ip);
             throw ex;
         }
+
+        limitador.registrarSucesso(ip);
 
         if (request.getSession(false) != null) {
             request.changeSessionId();

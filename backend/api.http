@@ -63,3 +63,17 @@ X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 ### 13. Depois do logout → 401
 GET {{base}}/api/auth/eu
+
+### 14. Força bruta: rode este 6 vezes seguidas → as 5 primeiras dão 401, a 6ª dá 429
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "chute-errado"}
+
+### 15. Logo depois, a senha CERTA também é bloqueada → 429
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "ana@teste.com", "senha": "senha-da-ana-1"}

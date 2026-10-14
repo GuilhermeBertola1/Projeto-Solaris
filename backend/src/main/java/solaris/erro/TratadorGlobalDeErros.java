@@ -51,6 +51,15 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
         return problema(HttpStatus.FORBIDDEN, "Acesso negado", "Você não tem permissão para esta ação.");
     }
 
+    @ExceptionHandler(MuitasTentativasException.class)
+    public ResponseEntity<ProblemDetail> muitasTentativas(MuitasTentativasException ex) {
+        ProblemDetail corpo = problema(HttpStatus.TOO_MANY_REQUESTS,
+                "Muitas tentativas", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getSegundosParaLiberar()))
+                .body(corpo);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers,
