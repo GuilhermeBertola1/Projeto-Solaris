@@ -174,3 +174,28 @@ X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 ### 32. Depois de apagada → 404
 GET {{base}}/api/plantas/{{plantaDaAna.response.body.$.id}}
+
+### ===================== REGAS =====================
+### Antes: teste 3 (token) e 9 ou 29 (login da Ana)
+
+### 33. Plantar uma nova planta para testar regas → 201
+# @name plantaParaRegar
+POST {{base}}/api/plantas
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"especieId": 41, "apelido": "Suculenta da mesa", "dataPlantio": "2026-08-01"}
+
+### 34. Regar → 201, com "estado" recalculado
+POST {{base}}/api/plantas/{{plantaParaRegar.response.body.$.id}}/regas
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+### 35. Histórico → 200, duas regas (a do plantio e a de agora), mais recente primeiro
+GET {{base}}/api/plantas/{{plantaParaRegar.response.body.$.id}}/regas
+
+### 36. Regar uma planta que não existe (ou de outro usuário) → 404
+POST {{base}}/api/plantas/999999/regas
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+### 37. Regar sem token CSRF → 403
+POST {{base}}/api/plantas/{{plantaParaRegar.response.body.$.id}}/regas

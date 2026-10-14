@@ -21,6 +21,7 @@ import solaris.repository.EspecieRepository;
 import solaris.repository.PlantaRepository;
 import solaris.repository.RegaRepository;
 import solaris.repository.UsuarioRepository;
+import solaris.dto.RegaResposta;
 
 @Service
 @Transactional
@@ -75,6 +76,20 @@ public class PlantaService {
 
     public void excluir(String email, Long id) {
         plantas.delete(buscarPlantaDoUsuario(email, id));
+    }
+
+    public PlantaResposta regar(String email, Long id) {
+        Planta planta = buscarPlantaDoUsuario(email, id);
+        regas.save(new Rega(planta));
+        return paraResposta(planta);
+    }
+
+    @Transactional(readOnly = true)
+    public PaginaResposta<RegaResposta> historicoDeRegas(String email, Long id, int pagina, int tamanho) {
+        Planta planta = buscarPlantaDoUsuario(email, id);
+        return PaginaResposta.de(
+                regas.findByPlantaIdOrderByRegadaEmDesc(planta.getId(), PageRequest.of(pagina, tamanho))
+                        .map(RegaResposta::de));
     }
 
     private Planta buscarPlantaDoUsuario(String email, Long id) {

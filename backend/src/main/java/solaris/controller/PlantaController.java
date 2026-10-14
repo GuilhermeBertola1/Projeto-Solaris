@@ -21,6 +21,7 @@ import solaris.dto.PlantaAtualizacaoRequisicao;
 import solaris.dto.PlantaRequisicao;
 import solaris.dto.PlantaResposta;
 import solaris.service.PlantaService;
+import solaris.dto.RegaResposta;
 
 @RestController
 @RequestMapping("/api/plantas")
@@ -62,5 +63,20 @@ public class PlantaController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluir(Authentication autenticacao, @PathVariable Long id) {
         service.excluir(autenticacao.getName(), id);
+    }
+
+    @PostMapping("/{id}/regas")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PlantaResposta regar(Authentication autenticacao, @PathVariable Long id) {
+        return service.regar(autenticacao.getName(), id);
+    }
+
+    @GetMapping("/{id}/regas")
+    public PaginaResposta<RegaResposta> historicoDeRegas(
+            Authentication autenticacao,
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") @Min(0) int pagina,
+            @RequestParam(defaultValue = "20") @Min(1) @Max(50) int tamanho) {
+        return service.historicoDeRegas(autenticacao.getName(), id, pagina, tamanho);
     }
 }
