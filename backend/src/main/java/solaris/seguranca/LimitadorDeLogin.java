@@ -13,7 +13,7 @@ import solaris.erro.MuitasTentativasException;
 @Component
 public class LimitadorDeLogin {
 
-    static final int MAXIMO_FALHAS = 5;
+    public static final int MAXIMO_FALHAS = 5;
     static final Duration JANELA = Duration.ofMinutes(15);
     private static final int LIMITE_DE_REGISTROS = 10_000;
 
