@@ -25,6 +25,12 @@ window.Solaris = window.Solaris || {};
     item.className = 'menu-sessao';
 
     if (usuario) {
+      if (usuario.perfil === 'ADMIN') {
+        const linkAdmin = document.createElement('a');
+        linkAdmin.href = 'admin.html';
+        linkAdmin.textContent = 'Administração';
+        item.append(linkAdmin);
+      }
       const saudacao = document.createElement('span');
       saudacao.textContent = 'Olá, ' + usuario.nome.split(' ')[0];
 

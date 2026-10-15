@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Área administrativa do Projeto Solaris: catálogo de espécies e contas de usuários.">
+    <title>Administração - Projeto Solaris</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body data-exige-login>
+    <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
+    <header>
+      <nav aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html">Meu Jardim</a></li>
+          <li><a href="catalogo.html">Pesquisar Plantas</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="conteudo-principal">
+      <h1>Administração</h1>
+
+      <p id="aviso-admin" class="aviso-admin" role="status" hidden></p>
+
+      <section class="secao-admin" aria-labelledby="titulo-form-especie">
+        <h2 id="titulo-form-especie">Cadastrar espécie</h2>
+
+        <form id="form-especie" class="formulario formulario--largo">
+          <p class="mensagem-erro" role="alert" hidden></p>
+
+          <div class="campo">
+            <label for="nomePopular">Nome popular</label>
+            <input type="text" id="nomePopular" name="nomePopular" required maxlength="100"
+                   aria-describedby="erro-nomePopular">
+            <p class="erro-campo" id="erro-nomePopular"></p>
+          </div>
+
+          <div class="campo">
+            <label for="nomeCientifico">Nome científico</label>
+            <input type="text" id="nomeCientifico" name="nomeCientifico" required maxlength="150"
+                   aria-describedby="erro-nomeCientifico">
+            <p class="erro-campo" id="erro-nomeCientifico"></p>
+          </div>
+
+          <div class="campo">
+            <label for="categoriaId">Categoria</label>
+            <select id="categoriaId" name="categoriaId" required aria-describedby="erro-categoriaId"></select>
+            <p class="erro-campo" id="erro-categoriaId"></p>
+          </div>
+
+          <div class="campo">
+            <label for="nivelLuzId">Luz</label>
+            <select id="nivelLuzId" name="nivelLuzId" aria-describedby="erro-nivelLuzId"></select>
+            <p class="erro-campo" id="erro-nivelLuzId"></p>
+          </div>
+
+          <div class="campo">
+            <label for="regimeRegaId">Rega</label>
+            <select id="regimeRegaId" name="regimeRegaId" required aria-describedby="erro-regimeRegaId"></select>
+            <p class="erro-campo" id="erro-regimeRegaId"></p>
+          </div>
+
+          <div class="campo">
+            <label for="dificuldade">Dificuldade</label>
+            <select id="dificuldade" name="dificuldade" required aria-describedby="erro-dificuldade"></select>
+            <p class="erro-campo" id="erro-dificuldade"></p>
+          </div>
+
+          <div class="campo">
+            <label for="fotoUrl">Foto (URL https:// ou assets/images/arquivo.jpg)</label>
+            <input type="text" id="fotoUrl" name="fotoUrl" maxlength="255"
+                   aria-describedby="erro-fotoUrl">
+            <p class="erro-campo" id="erro-fotoUrl"></p>
+          </div>
+
+          <div class="acoes-formulario">
+            <button type="submit" class="botao">Salvar</button>
+            <button type="button" class="botao botao--secundario" id="btn-cancelar-edicao" hidden>Cancelar edição</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="secao-admin" aria-labelledby="titulo-especies">
+        <h2 id="titulo-especies">Espécies do catálogo</h2>
+        <div class="tabela-rolavel">
+          <table class="tabela-admin">
+            <thead>
+              <tr>
+                <th scope="col">Nome popular</th>
+                <th scope="col">Nome científico</th>
+                <th scope="col">Situação</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="corpo-especies"></tbody>
+          </table>
+        </div>
+        <div class="paginacao" id="paginacao-especies"></div>
+      </section>
+
+      <section class="secao-admin" aria-labelledby="titulo-usuarios">
+        <h2 id="titulo-usuarios">Usuários</h2>
+        <div class="tabela-rolavel">
+          <table class="tabela-admin">
+            <thead>
+              <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Perfil</th>
+                <th scope="col">Situação</th>
+                <th scope="col">Último login</th>
+                <th scope="col">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="corpo-usuarios"></tbody>
+          </table>
+        </div>
+        <div class="paginacao" id="paginacao-usuarios"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Projeto desenvolvido para a disciplina SCOM.</p>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/models/apiCliente.js"></script>
+    <script src="js/models/authModel.js"></script>
+    <script src="js/views/menuSessao.js"></script>
+    <script src="js/views/formularioView.js"></script>
+    <script src="js/models/imagemModel.js"></script>
+    <script src="js/models/plantasModel.js"></script>
+    <script src="js/models/adminModel.js"></script>
+    <script src="js/viewmodels/adminViewModel.js"></script>
+    <script src="js/adminApp.js"></script>
+  </body>
+</html>

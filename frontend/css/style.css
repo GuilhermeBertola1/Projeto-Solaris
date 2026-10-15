@@ -743,3 +743,78 @@ footer {
 .botao-link:hover {
   color: var(--cor-secundaria);
 }
+
+/* ---------- 10. Área administrativa ---------- */
+.secao-admin {
+  margin-bottom: var(--espaco-secao);
+}
+
+.formulario--largo {
+  max-width: none;
+  margin: 0;
+}
+
+.campo select {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--cor-texto-suave);
+  border-radius: var(--raio-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--cor-texto);
+  background-color: var(--cor-fundo);
+}
+
+.campo select[aria-invalid="true"] {
+  border: 2px solid var(--cor-destaque);
+}
+
+.acoes-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.aviso-admin {
+  background-color: var(--cor-primaria-clara);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tabela-rolavel {
+  overflow-x: auto;
+}
+
+.tabela-admin {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--cor-fundo);
+}
+
+.tabela-admin th,
+.tabela-admin td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--cor-borda);
+  vertical-align: middle;
+}
+
+.tabela-admin th {
+  color: var(--cor-texto);
+  font-weight: 700;
+}
+
+.acoes-tabela {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
