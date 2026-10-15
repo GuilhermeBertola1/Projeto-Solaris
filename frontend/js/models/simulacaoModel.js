@@ -3,8 +3,6 @@ window.Solaris = window.Solaris || {};
 (function (Solaris) {
   'use strict';
 
-  const MS_POR_DIA = 1000 * 60 * 60 * 24;
-
   const DIAS_FIM_BROTACAO = 15;
   const DIAS_FIM_VEGETATIVO = 30;
 
@@ -23,6 +21,10 @@ window.Solaris = window.Solaris || {};
   };
 
   function regimeDeRega(planta) {
+    const doServidor = INTERVALOS_REGA[String(planta.regimeRega || '').toLowerCase()];
+    if (doServidor) {
+      return doServidor;
+    }
     const categoria = normalizarCategoria(planta);
     if (categoria === 'suculenta') {
       return INTERVALOS_REGA.espacada;
@@ -156,46 +158,6 @@ window.Solaris = window.Solaris || {};
     }
   };
 
-  function calcularEstadoPlanta(planta) {
-    const agora = Date.now();
-    const diasDePlantada = Math.max(0, Math.floor((agora - planta.dataAdicionada) / MS_POR_DIA));
-    const diasSemRegar = Math.max(0, (agora - planta.ultimaRega) / MS_POR_DIA);
-
-    const regime = regimeDeRega(planta);
-    const diasAteProximaRega = Math.ceil(regime.dias - diasSemRegar);
-
-    let fase;
-    if (diasDePlantada < DIAS_FIM_BROTACAO) {
-      fase = 'brotacao';
-    } else if (diasDePlantada < DIAS_FIM_VEGETATIVO) {
-      fase = 'vegetativo';
-    } else {
-      fase = 'adulta';
-    }
-
-    let humor;
-    if (diasSemRegar > regime.dias) {
-      humor = 'sedenta';
-    } else if (diasSemRegar > regime.dias / 2) {
-      humor = 'atencao';
-    } else {
-      humor = 'feliz';
-    }
-
-    return {
-      diasDePlantada: diasDePlantada,
-      diasSemRegar: diasSemRegar,
-      fase: fase,
-      humor: humor,
-      categoria: normalizarCategoria(planta),
-      rotuloCategoria: CATEGORIAS[normalizarCategoria(planta)].rotulo,
-      intervaloRega: regime.dias,
-      textoRega: regime.texto,
-      diasAteProximaRega: diasAteProximaRega,
-      progresso: calcularProgresso(fase, diasDePlantada)
-    };
-  }
-
   function calcularProgresso(fase, diasDePlantada) {
     const limites = LIMITES_FASE[fase];
     const diaNaFase = diasDePlantada - limites.inicio;
@@ -230,9 +192,10 @@ window.Solaris = window.Solaris || {};
   }
 
   Solaris.simulacaoModel = {
-    calcularEstadoPlanta: calcularEstadoPlanta,
     descreverFase: descreverFase,
     descreverProximaRega: descreverProximaRega,
+    calcularProgresso: calcularProgresso,
+    regimeDeRega: regimeDeRega,
     ORDEM_FASES: ORDEM_FASES,
     LIMITES_FASE: LIMITES_FASE,
     CATEGORIAS: CATEGORIAS,

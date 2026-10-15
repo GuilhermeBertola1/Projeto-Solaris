@@ -128,6 +128,11 @@
   }
 
   function renderizar(estado) {
+    if (estado.erro) {
+      elTitulo.textContent = 'Erro ao carregar';
+      elConteudo.innerHTML = mensagemDeErro(esc(estado.erro));
+      return;
+    }
     if (!estado.encontrada) {
       elTitulo.textContent = 'Planta não encontrada';
       elConteudo.innerHTML = mensagemDeErro('Não encontramos essa planta no seu jardim.');
@@ -180,16 +185,24 @@
   function ligarAcoes(planta, humor) {
     const botaoRegar = document.getElementById('btn-regar');
 
-    botaoRegar.addEventListener('click', function () {
+    botaoRegar.addEventListener('click', async function () {
+      botaoRegar.disabled = true;
       devolverFocoAoBotao = true;
-      viewModel.regar();
 
-      // regar() re-renderiza de forma síncrona, então aqui o estado já está
-      // atualizado — a mensagem descreve o humor novo, não o anterior.
-      if (elFeedback && viewModel.estado.planta) {
-        const novo = simulacao.HUMOR_INFO[viewModel.estado.planta.humor];
-        const proxima = simulacao.descreverProximaRega(viewModel.estado.planta);
-        elFeedback.textContent = 'Rega registrada. ' + novo.label + '. ' + proxima.texto + '.';
+      try {
+        await viewModel.regar();
+
+        if (elFeedback && viewModel.estado.planta) {
+          const novo = simulacao.HUMOR_INFO[viewModel.estado.planta.humor];
+          const proxima = simulacao.descreverProximaRega(viewModel.estado.planta);
+          elFeedback.textContent = 'Rega registrada. ' + novo.label + '. ' + proxima.texto + '.';
+        }
+      } catch (erro) {
+        devolverFocoAoBotao = false;
+        botaoRegar.disabled = false;
+        if (elFeedback) {
+          elFeedback.textContent = 'Não foi possível registrar a rega. ' + erro.message;
+        }
       }
     });
 
@@ -207,9 +220,17 @@
 
     const botaoConfirmar = document.getElementById('btn-confirmar-remocao');
     if (botaoConfirmar) {
-      botaoConfirmar.addEventListener('click', function () {
-        viewModel.remover();
-        window.location.href = 'index.html';
+      botaoConfirmar.addEventListener('click', async function () {
+        botaoConfirmar.disabled = true;
+        try {
+          await viewModel.remover();
+          window.location.href = 'index.html';
+        } catch (erro) {
+          botaoConfirmar.disabled = false;
+          if (elFeedback) {
+            elFeedback.textContent = 'Não foi possível remover a planta. ' + erro.message;
+          }
+        }
       });
     }
 
@@ -234,10 +255,14 @@
   if (!instanceId) {
     elTitulo.textContent = 'Planta não encontrada';
     elConteudo.innerHTML = mensagemDeErro('Nenhuma planta foi informada no endereço da página.');
+    Solaris.utils.revelarPagina();
   } else {
-    viewModel = Solaris.makePerfilViewModel(instanceId, renderizar);
+    Solaris.sessao.pronta.then(function (usuario) {
+      if (!usuario) {
+        return;
+      }
+      viewModel = Solaris.makePerfilViewModel(instanceId, renderizar);
+      viewModel.carregar().finally(Solaris.utils.revelarPagina);
+    });
   }
-
-  // Conteúdo montado: pode mostrar a página, sem salto de layout.
-  Solaris.utils.revelarPagina();
 })(window.Solaris);
