@@ -29,6 +29,26 @@ services:
       timeout: 3s
       retries: 20
       start_period: 20s
+  APP:
+    build: .
+    image: solaris-app
+    container_name: solaris-APP
+    restart: unless-stopped
+    depends_on:
+      MYSQL:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://MYSQL:3306/solaris
+      DB_USUARIO: ${DB_USUARIO:?defina DB_USUARIO no .env}
+      DB_SENHA: ${DB_SENHA:?defina DB_SENHA no .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_SENHA: ${ADMIN_SENHA:-}
+      PERENUAL_API_KEY: ${PERENUAL_API_KEY:-}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - logs-app:/app/logs
 
 volumes:
   dados-mysql:
+  logs-app:
