@@ -60,6 +60,10 @@ public class Usuario {
         this.ultimoLoginEm = LocalDateTime.now();
     }
 
+    public void definirAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public Long getId() { return id; }
     public String getNome() { return nome; }
     public String getEmail() { return email; }

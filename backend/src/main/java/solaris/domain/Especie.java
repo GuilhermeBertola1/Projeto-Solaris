@@ -66,6 +66,36 @@ public class Especie {
 
     protected Especie() { }
 
+    public Especie(String nomePopular, String nomeCientifico, Categoria categoria,
+                   NivelLuz nivelLuz, RegimeRega regimeRega, Dificuldade dificuldade,
+                   String fotoUrl) {
+        this.nomePopular = nomePopular;
+        this.nomeCientifico = nomeCientifico;
+        this.categoria = categoria;
+        this.nivelLuz = nivelLuz;
+        this.regimeRega = regimeRega;
+        this.dificuldade = dificuldade;
+        this.fotoUrl = fotoUrl;
+        this.origem = OrigemEspecie.LOCAL;
+        this.ativo = true;
+    }
+
+    public void atualizar(String nomePopular, String nomeCientifico, Categoria categoria,
+                          NivelLuz nivelLuz, RegimeRega regimeRega, Dificuldade dificuldade,
+                          String fotoUrl) {
+        this.nomePopular = nomePopular;
+        this.nomeCientifico = nomeCientifico;
+        this.categoria = categoria;
+        this.nivelLuz = nivelLuz;
+        this.regimeRega = regimeRega;
+        this.dificuldade = dificuldade;
+        this.fotoUrl = fotoUrl;
+    }
+
+    public void definirAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public Integer getId() { return id; }
     public String getNomePopular() { return nomePopular; }
     public String getNomeCientifico() { return nomeCientifico; }

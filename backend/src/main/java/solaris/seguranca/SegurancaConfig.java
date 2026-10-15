@@ -20,6 +20,8 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import solaris.repository.UsuarioRepository;
 
 @Configuration
 public class SegurancaConfig {
@@ -27,7 +29,8 @@ public class SegurancaConfig {
     @Bean
     public SecurityFilterChain filtroDeSeguranca(HttpSecurity http,
             SecurityContextRepository repositorioDeContexto,
-            DelegadorDeErrosDeSeguranca errosDeSeguranca) throws Exception {
+            DelegadorDeErrosDeSeguranca errosDeSeguranca,
+            UsuarioRepository usuarios) throws Exception {
         http
             .authorizeHttpRequests(regras -> regras
                 .requestMatchers(HttpMethod.GET, "/api/especies/**").permitAll()
@@ -50,6 +53,8 @@ public class SegurancaConfig {
                 .accessDeniedHandler(errosDeSeguranca))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
+        
+        http.addFilterAfter(new FiltroContaAtiva(usuarios), SecurityContextHolderFilter.class);
 
         return http.build();
     }
