@@ -3,56 +3,50 @@ window.Solaris = window.Solaris || {};
 (function (Solaris) {
   'use strict';
 
-  const API_KEY = 'sk-CsNR6a805dcfa54f519383';
-  const API_URL_BASE = 'https://perenual.com/api/species-list';
+  const TAMANHO_PAGINA = 24;
 
-  const API_DISPONIVEL = (
-    window.location.protocol === 'http:' ||
-    window.location.protocol === 'https:'
-  );
+  const ROTULOS_DIFICULDADE = {
+    MUITO_FACIL: 'Muito fácil',
+    FACIL: 'Fácil',
+    MEDIA: 'Média',
+    DIFICIL: 'Difícil'
+  };
 
-  function normalizarItemDaApi(item) {
+  function paraPlantaDaTela(especie) {
     return {
-      id: item.id,
-      nome: item.common_name || 'Planta Desconhecida',
-      especie: (item.scientific_name && item.scientific_name[0]) || 'Sem nome científico',
-      luz: Array.isArray(item.sunlight) ? item.sunlight.join(', ') : (item.sunlight || 'Não informada'),
-      dificuldade: item.watering || 'Média',
-      categoria: null,
-      foto: Solaris.imagemModel.normalizarFoto(item.default_image && item.default_image.thumbnail)
+      id: especie.id,
+      nome: especie.nomePopular,
+      especie: especie.nomeCientifico,
+      luz: especie.luz || 'Não informada',
+      dificuldade: ROTULOS_DIFICULDADE[especie.dificuldade] || especie.dificuldade,
+      categoria: especie.categoria,
+      rotuloCategoria: especie.categoriaRotulo,
+      regimeRega: especie.regimeRega,
+      intervaloRegaDias: especie.intervaloRegaDias,
+      foto: Solaris.imagemModel.normalizarFoto(especie.fotoUrl)
     };
   }
 
-  function buscarNoBancoLocal(termo) {
-    const alvo = termo.toLowerCase();
-    return Solaris.PLANTAS_LOCAIS.filter(function (planta) {
-      return planta.nome.toLowerCase().includes(alvo) ||
-             planta.especie.toLowerCase().includes(alvo);
+  async function obterPlantas(termo, pagina) {
+    const parametros = new URLSearchParams({
+      pagina: String(pagina || 0),
+      tamanho: String(TAMANHO_PAGINA)
     });
-  }
-
-  async function obterPlantas(termo) {
-    const busca = termo || '';
-
-    if (!API_DISPONIVEL) {
-      return buscarNoBancoLocal(busca);
+    if (termo && termo.trim()) {
+      parametros.set('q', termo.trim());
     }
 
-    const url = API_URL_BASE + '?key=' + API_KEY + '&q=' + encodeURIComponent(busca);
+    const resposta = await Solaris.api.get('/api/especies?' + parametros.toString());
 
-    try {
-      const resposta = await fetch(url);
-      if (!resposta.ok) {
-        throw new Error('Conexão com a API falhou');
-      }
-
-      const resultado = await resposta.json();
-      return resultado.data.map(normalizarItemDaApi);
-    } catch (erro) {
-      console.warn('API indisponível. Utilizando banco de dados local:', erro);
-      return buscarNoBancoLocal(busca);
-    }
+    return {
+      plantas: resposta.itens.map(paraPlantaDaTela),
+      temMais: resposta.pagina + 1 < resposta.totalPaginas
+    };
   }
 
-  Solaris.plantasModel = { obterPlantas: obterPlantas };
+  Solaris.plantasModel = {
+    obterPlantas: obterPlantas,
+    paraPlantaDaTela: paraPlantaDaTela,
+    ROTULOS_DIFICULDADE: ROTULOS_DIFICULDADE
+  };
 })(window.Solaris);

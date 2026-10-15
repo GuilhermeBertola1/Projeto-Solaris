@@ -114,6 +114,22 @@ window.Solaris = window.Solaris || {};
     atualizarFoto: atualizarFoto,
     obterPlantaDoJardim: obterPlantaDoJardim,
     regarPlanta: regarPlanta,
+    plantar: plantar,
     removerDoJardim: removerDoJardim
   };
+
+  function hojeISO() {
+    const hoje = new Date();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return hoje.getFullYear() + '-' + mes + '-' + dia;
+  }
+
+  function plantar(especieId, apelido) {
+    return Solaris.api.post('/api/plantas', {
+      especieId: especieId,
+      apelido: apelido || null,
+      dataPlantio: hojeISO()
+    });
+  }
 })(window.Solaris);
