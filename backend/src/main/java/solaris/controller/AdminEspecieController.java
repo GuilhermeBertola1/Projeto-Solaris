@@ -21,6 +21,7 @@ import solaris.dto.EspecieAdminResposta;
 import solaris.dto.EspecieRequisicao;
 import solaris.dto.PaginaResposta;
 import solaris.service.AdminEspecieService;
+import solaris.dto.OpcoesEspecieResposta;
 
 @RestController
 @RequestMapping("/api/admin/especies")
@@ -37,6 +38,11 @@ public class AdminEspecieController {
             @RequestParam(defaultValue = "0") @Min(0) int pagina,
             @RequestParam(defaultValue = "20") @Min(1) @Max(50) int tamanho) {
         return service.listar(pagina, tamanho);
+    }
+
+    @GetMapping("/opcoes")
+    public OpcoesEspecieResposta opcoes() {
+        return service.opcoes();
     }
 
     @GetMapping("/{id}")

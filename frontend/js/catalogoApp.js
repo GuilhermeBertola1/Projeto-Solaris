@@ -1,36 +1,36 @@
-/**
- * View do catálogo (catalogo.html).
- * Liga o formulário de busca ao ViewModel e trata a adição ao jardim.
- */
 (function (Solaris) {
   'use strict';
+
+  const esc = Solaris.utils.escaparHTML;
 
   const inputBusca = document.getElementById('busca');
   const formBusca = document.getElementById('form-busca');
   const containerResultados = document.getElementById('container-resultados');
+  const botaoMais = document.getElementById('btn-mais');
   const feedback = document.getElementById('feedback-jardim');
 
-  // Espera entre a última tecla digitada e a busca, em milissegundos.
   const ESPERA_BUSCA = 300;
-
-  // Quantos cards carregam a imagem com prioridade alta (primeira dobra).
   const CARDS_PRIORITARIOS = 3;
 
+  function mensagem(texto) {
+    containerResultados.innerHTML = '<p class="mensagem-status">' + texto + '</p>';
+    botaoMais.hidden = true;
+  }
+
   function renderizarResultados(estado) {
-    if (estado.carregando) {
-      containerResultados.innerHTML = '<p class="mensagem-status">Carregando plantas...</p>';
+    if (estado.erro) {
+      mensagem(esc(estado.erro));
       return;
     }
 
     if (estado.plantas.length === 0) {
-      containerResultados.innerHTML = '<p class="mensagem-status">Nenhuma planta encontrada para "' +
-        Solaris.utils.escaparHTML(estado.termoBusca) + '".</p>';
+      mensagem(estado.carregando
+        ? 'Carregando plantas...'
+        : 'Nenhuma planta encontrada para "' + esc(estado.termoBusca) + '".');
       return;
     }
 
-    // Os cards já ocupam o espaço: a altura reservada não é mais necessária.
     containerResultados.classList.add('pronto');
-
     containerResultados.innerHTML = estado.plantas.map(function (planta, indice) {
       return Solaris.views.cardPlanta(planta, {
         acao: 'botao',
@@ -38,12 +38,14 @@
         prioritaria: indice < CARDS_PRIORITARIOS
       });
     }).join('');
+
+    botaoMais.hidden = !estado.temMais;
+    botaoMais.disabled = estado.carregando;
+    botaoMais.textContent = estado.carregando ? 'Carregando...' : 'Mostrar mais plantas';
   }
 
   const viewModel = Solaris.makeCatalogoViewModel(renderizarResultados);
 
-  // Busca enquanto o usuário digita, mas só depois que ele para — sem o
-  // debounce seria uma requisição por tecla.
   const buscarComAtraso = Solaris.utils.debounce(function (termo) {
     viewModel.buscar(termo);
   }, ESPERA_BUSCA);
@@ -57,40 +59,48 @@
     viewModel.buscar(inputBusca.value);
   });
 
-  // Delegação de evento: um único listener no container cobre todos os botões
-  // "Adicionar ao Jardim", inclusive os recriados a cada nova busca.
-  containerResultados.addEventListener('click', function (evento) {
+  botaoMais.addEventListener('click', function () {
+    viewModel.carregarMais();
+  });
+
+  // Delegação de evento: um único listener cobre todos os botões
+  // "Adicionar ao Jardim", inclusive os recriados a cada busca.
+  containerResultados.addEventListener('click', async function (evento) {
     const botao = evento.target.closest('button[data-adicionar]');
     if (!botao) {
       return;
     }
 
-    const indice = Number(botao.dataset.indice);
-    const planta = viewModel.estado.plantas[indice];
+    const planta = viewModel.estado.plantas[Number(botao.dataset.indice)];
     if (!planta) {
       return;
     }
 
-    const entrada = Solaris.jardimModel.adicionarAoJardim(planta);
-
-    botao.textContent = 'Adicionado';
-    botao.disabled = true;
-
-    // Região aria-live: anuncia a ação a leitores de tela sem usar alert().
-    if (feedback) {
-      feedback.textContent = planta.nome + ' foi adicionada ao seu jardim.';
+    const usuario = await Solaris.sessao.pronta;
+    if (!usuario) {
+      Solaris.sessao.irParaLogin();
+      return;
     }
 
-    // A planta já está salva; a cópia da foto vem em segundo plano para não
-    // travar a interface. As URLs da API expiram em 24h (assinatura AWS), então
-    // guardamos a imagem junto dos dados — ver js/models/imagemModel.js.
-    Solaris.imagemModel.capturarComoDataUri(planta.foto).then(function (dataUri) {
-      if (dataUri) {
-        Solaris.jardimModel.atualizarFoto(entrada.instanceId, dataUri);
+    botao.disabled = true;
+    try {
+      await Solaris.jardimModel.plantar(planta.id);
+      botao.textContent = 'Adicionado';
+      if (feedback) {
+        feedback.textContent = planta.nome + ' foi adicionada ao seu jardim.';
       }
-    });
+    } catch (erro) {
+      if (erro.status === 401) {
+        Solaris.sessao.irParaLogin();
+        return;
+      }
+      botao.disabled = false;
+      botao.textContent = 'Tentar de novo';
+      if (feedback) {
+        feedback.textContent = 'Não foi possível adicionar ' + planta.nome + '. ' + erro.message;
+      }
+    }
   });
 
-  // Busca inicial com termo vazio, para a página já abrir com sugestões.
   viewModel.buscar('');
 })(window.Solaris);

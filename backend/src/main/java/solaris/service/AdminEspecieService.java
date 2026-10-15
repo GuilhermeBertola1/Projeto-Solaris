@@ -19,6 +19,7 @@ import solaris.repository.CategoriaRepository;
 import solaris.repository.EspecieRepository;
 import solaris.repository.NivelLuzRepository;
 import solaris.repository.RegimeRegaRepository;
+import solaris.dto.OpcoesEspecieResposta;
 
 @Service
 @Transactional
@@ -49,6 +50,21 @@ public class AdminEspecieService {
     @Transactional(readOnly = true)
     public EspecieAdminResposta buscar(Integer id) {
         return EspecieAdminResposta.de(buscarEspecie(id));
+    }
+
+    @Transactional(readOnly = true)
+    public OpcoesEspecieResposta opcoes() {
+        return new OpcoesEspecieResposta(
+                categorias.findAll(Sort.by("id")).stream()
+                        .map(c -> new OpcoesEspecieResposta.Opcao(c.getId(), c.getRotulo()))
+                        .toList(),
+                niveisDeLuz.findAll(Sort.by("id")).stream()
+                        .map(n -> new OpcoesEspecieResposta.Opcao(n.getId(), n.getRotulo()))
+                        .toList(),
+                regimesDeRega.findAll(Sort.by("id")).stream()
+                        .map(r -> new OpcoesEspecieResposta.Opcao(r.getId(),
+                                "A cada " + r.getIntervaloDias() + " dias — " + r.getDescricao()))
+                        .toList());
     }
 
     public EspecieAdminResposta criar(String adminEmail, EspecieRequisicao r) {

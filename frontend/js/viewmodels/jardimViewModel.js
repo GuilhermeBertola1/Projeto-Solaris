@@ -4,63 +4,76 @@ window.Solaris = window.Solaris || {};
   'use strict';
 
   function criarEstadoReativo(estadoBase, onStateChange) {
-    const estado = new Proxy(estadoBase, {
+    return new Proxy(estadoBase, {
       set: function (alvo, propriedade, valor) {
         alvo[propriedade] = valor;
-        onStateChange(estado);
+        onStateChange(alvo);
         return true;
       }
     });
-    return estado;
   }
 
-  function comEstadoCalculado(planta) {
-    return Object.assign({}, planta, Solaris.simulacaoModel.calcularEstadoPlanta(planta));
+  // Sessão expirada no meio do uso: volta para o login.
+  function tratarErro(erro, estado, mensagem) {
+    if (erro && erro.status === 401) {
+      Solaris.sessao.irParaLogin();
+      return;
+    }
+    console.warn(mensagem, erro);
+    estado.erro = mensagem;
   }
 
   function makeJardimViewModel(onStateChange) {
-    const estado = criarEstadoReativo({ plantas: [] }, onStateChange);
+    const estado = criarEstadoReativo(
+      { plantas: [], carregando: true, erro: null }, onStateChange);
 
-    function carregar() {
-      estado.plantas = Solaris.jardimModel.obterJardim().map(comEstadoCalculado);
+    async function carregar() {
+      try {
+        estado.plantas = await Solaris.jardimModel.obterJardim();
+      } catch (erro) {
+        tratarErro(erro, estado, 'Não foi possível carregar o seu jardim.');
+      } finally {
+        estado.carregando = false;
+      }
     }
 
-    function regar(instanceId) {
-      Solaris.jardimModel.regarPlanta(instanceId);
-      carregar();
-    }
-
-    carregar();
-
-    return { estado: estado, carregar: carregar, regar: regar };
+    return { estado: estado, carregar: carregar };
   }
 
-  function makePerfilViewModel(instanceId, onStateChange) {
-    const estado = criarEstadoReativo({ planta: null, encontrada: true }, onStateChange);
+  function makePerfilViewModel(id, onStateChange) {
+    const estado = criarEstadoReativo(
+      { planta: null, encontrada: true, carregando: true, erro: null }, onStateChange);
 
-    function carregar() {
-      const planta = Solaris.jardimModel.obterPlantaDoJardim(instanceId);
-
-      if (!planta) {
-        estado.encontrada = false;
-        return;
-      }
-
-      estado.planta = comEstadoCalculado(planta);
+    async function comHistorico(planta) {
+      planta.historicoRegas = await Solaris.jardimModel.obterHistoricoDeRegas(id);
+      return planta;
     }
 
-    function regar() {
-      Solaris.jardimModel.regarPlanta(instanceId);
-      carregar();
+    async function carregar() {
+      try {
+        const planta = await Solaris.jardimModel.obterPlantaDoJardim(id);
+        if (!planta) {
+          estado.encontrada = false;
+          return;
+        }
+        estado.planta = await comHistorico(planta);
+      } catch (erro) {
+        tratarErro(erro, estado, 'Não foi possível carregar esta planta.');
+      } finally {
+        estado.carregando = false;
+      }
+    }
+
+    async function regar() {
+      const atualizada = await Solaris.jardimModel.regarPlanta(id);
+      estado.planta = await comHistorico(atualizada);
     }
 
     function remover() {
-      Solaris.jardimModel.removerDoJardim(instanceId);
+      return Solaris.jardimModel.removerDoJardim(id);
     }
 
-    carregar();
-
-    return { estado: estado, regar: regar, remover: remover };
+    return { estado: estado, carregar: carregar, regar: regar, remover: remover };
   }
 
   Solaris.makeJardimViewModel = makeJardimViewModel;

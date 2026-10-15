@@ -314,3 +314,17 @@ Content-Type: application/json
 X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 {"email": "bruno@teste.com", "senha": "senha-do-bruno-1"}
+
+### ===================== BUSCA NO CATÁLOGO =====================
+
+### 56. Busca simples → 200
+GET {{base}}/api/especies?q=tomate
+
+### 57. Sem acento e minúsculo encontra "Hortelã" (collation ai_ci) → 200
+GET {{base}}/api/especies?q=hortela
+
+### 58. Pelo nome científico → 200
+GET {{base}}/api/especies?q=solanum
+
+### 59. Tentativa de SQL Injection → 200 com "itens": [] (tratada como texto)
+GET {{base}}/api/especies?q=' OR '1'='1

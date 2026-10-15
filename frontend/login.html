@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entre no Projeto Solaris para acompanhar o seu jardim virtual.">
+    <title>Entrar - Projeto Solaris</title>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
+
+    <header>
+      <nav aria-label="Navegação principal">
+        <ul>
+          <li><a href="index.html">Meu Jardim</a></li>
+          <li><a href="catalogo.html">Pesquisar Plantas</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="conteudo-principal">
+      <h1>Entrar</h1>
+
+      <form id="form-login" class="formulario">
+        <p class="mensagem-erro" role="alert" hidden></p>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" autocomplete="username"
+                 required maxlength="254" aria-describedby="erro-email">
+          <p class="erro-campo" id="erro-email"></p>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" autocomplete="current-password"
+                 required maxlength="72" aria-describedby="erro-senha">
+          <p class="erro-campo" id="erro-senha"></p>
+        </div>
+
+        <button type="submit" class="botao">Entrar</button>
+      </form>
+
+      <p class="texto-centro">Ainda não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+    </main>
+
+    <footer>
+      <p>Projeto desenvolvido para a disciplina SCOM.</p>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="js/models/apiCliente.js"></script>
+    <script src="js/models/authModel.js"></script>
+    <script src="js/views/formularioView.js"></script>
+    <script src="js/views/menuSessao.js"></script>
+    <script src="js/loginApp.js"></script>
+  </body>
+</html>

@@ -1,14 +1,14 @@
 /**
  * View do painel "Meu Jardim" (index.html).
- * Lê o estado do ViewModel e escreve o HTML dos cards no DOM.
  */
 (function (Solaris) {
   'use strict';
 
+  const esc = Solaris.utils.escaparHTML;
+
   const containerAtencao = document.getElementById('container-atencao');
   const containerTodas = document.getElementById('container-todas');
 
-  // Quantos cards carregam a imagem com prioridade alta (primeira dobra).
   const CARDS_PRIORITARIOS = 3;
 
   function listaDeCards(plantas) {
@@ -22,6 +22,17 @@
   }
 
   function renderizarJardim(estado) {
+    if (estado.carregando) {
+      return;
+    }
+
+    if (estado.erro) {
+      containerAtencao.innerHTML = '';
+      containerTodas.innerHTML = '<p class="mensagem-status">' + esc(estado.erro) + '</p>';
+      Solaris.utils.revelarPagina();
+      return;
+    }
+
     const precisamAtencao = estado.plantas.filter(function (planta) {
       return planta.humor !== 'feliz';
     });
@@ -34,10 +45,14 @@
       ? listaDeCards(estado.plantas)
       : '<p class="mensagem-status">Seu jardim está vazio. ' +
         '<a href="catalogo.html">Busque plantas no catálogo</a> e adicione a primeira.</p>';
+
+    Solaris.utils.revelarPagina();
   }
 
-  Solaris.makeJardimViewModel(renderizarJardim);
-
-  // Cards já estão no DOM: pode mostrar a página, sem salto de layout.
-  Solaris.utils.revelarPagina();
+  Solaris.sessao.pronta.then(function (usuario) {
+    if (!usuario) {
+      return;
+    }
+    Solaris.makeJardimViewModel(renderizarJardim).carregar();
+  });
 })(window.Solaris);
