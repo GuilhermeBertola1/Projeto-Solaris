@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Min;
 import solaris.dto.EspecieResposta;
 import solaris.dto.PaginaResposta;
 import solaris.service.EspecieService;
+import jakarta.validation.constraints.Size;
 
 @RestController
 @RequestMapping("/api/especies")
@@ -24,9 +25,10 @@ public class EspecieController {
 
     @GetMapping
     public PaginaResposta<EspecieResposta> listar(
+            @RequestParam(required = false) @Size(max = 100) String q,
             @RequestParam(defaultValue = "0") @Min(0) int pagina,
             @RequestParam(defaultValue = "20") @Min(1) @Max(50) int tamanho) {
-        return service.listar(pagina, tamanho);
+        return service.listar(q, pagina, tamanho);
     }
 
     @GetMapping("/{id}")

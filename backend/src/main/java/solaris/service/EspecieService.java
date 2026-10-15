@@ -10,6 +10,8 @@ import solaris.dto.EspecieResposta;
 import solaris.dto.PaginaResposta;
 import solaris.erro.RecursoNaoEncontradoException;
 import solaris.repository.EspecieRepository;
+import org.springframework.data.domain.Page;
+import solaris.domain.Especie;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,10 +23,14 @@ public class EspecieService {
         this.repositorio = repositorio;
     }
 
-    public PaginaResposta<EspecieResposta> listar(int pagina, int tamanho) {
+    public PaginaResposta<EspecieResposta> listar(String termo, int pagina, int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("nomePopular", "id"));
-        return PaginaResposta.de(
-                repositorio.findByAtivoTrue(pageable).map(EspecieResposta::de));
+
+        Page<Especie> resultado = (termo == null || termo.isBlank())
+                ? repositorio.findByAtivoTrue(pageable)
+                : repositorio.buscarAtivasPorNome(termo.trim(), pageable);
+
+        return PaginaResposta.de(resultado.map(EspecieResposta::de));
     }
 
     public EspecieResposta buscar(Integer id) {
