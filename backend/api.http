@@ -264,3 +264,53 @@ X-XSRF-TOKEN: {{csrf.response.body.$.token}}
 
 ### 48. USUARIO comum em rota de admin → 403 "Acesso negado"
 GET {{base}}/api/admin/especies
+
+### ===================== ADMIN: USUÁRIOS =====================
+### Antes: teste 3 (token). Ambiente "local" ativo.
+### Troque o número abaixo pelo id do Bruno que aparece no teste 50
+@brunoId = 3
+
+### 49. Login do admin → 200
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "{{adminEmail}}", "senha": "{{adminSenha}}"}
+
+### 50. Listar usuários → 200 (sem senhaHash!)
+GET {{base}}/api/admin/usuarios
+
+### 51. Tentar desativar o próprio admin (id 1) → 409
+PATCH {{base}}/api/admin/usuarios/1/ativo
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"ativo": false}
+
+### 52. Desativar o Bruno → 200, "ativo": false
+PATCH {{base}}/api/admin/usuarios/{{brunoId}}/ativo
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"ativo": false}
+
+### 53. Bruno tenta entrar → 401 "E-mail ou senha inválidos."
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "bruno@teste.com", "senha": "senha-do-bruno-1"}
+
+### 54. Reativar o Bruno → 200 (a sessão do admin continua, o login do 53 falhou)
+PATCH {{base}}/api/admin/usuarios/{{brunoId}}/ativo
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"ativo": true}
+
+### 55. Bruno entra de novo → 200
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-XSRF-TOKEN: {{csrf.response.body.$.token}}
+
+{"email": "bruno@teste.com", "senha": "senha-do-bruno-1"}
