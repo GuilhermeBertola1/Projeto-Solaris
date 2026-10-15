@@ -13,12 +13,7 @@
          aparecem ja na posicao final. O tempo-limite garante que a pagina
          apareca mesmo se algum script falhar, e quem esta sem JavaScript nunca
          recebe a classe. -->
-    <script>
-      document.documentElement.classList.add('js-montando');
-      setTimeout(function () {
-        document.documentElement.classList.remove('js-montando');
-      }, 2000);
-    </script>
+    <script src="js/montagem.js"></script>
   </head>
   <body data-exige-login>
     <a class="link-pular" href="#conteudo-principal">Pular para o conteúdo principal</a>
