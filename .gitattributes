@@ -1,0 +1,14 @@
+# Normaliza texto: no repositório sempre LF; no checkout, conforme o sistema
+* text=auto
+
+# Arquivos lidos dentro de containers Linux: sempre LF
+Dockerfile   text eol=lf
+*.sh         text eol=lf
+*.yaml       text eol=lf
+
+# Binários: nunca converter
+*.jpg  binary
+*.jpeg binary
+*.png  binary
+*.webp binary
+*.ico  binary
