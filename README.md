@@ -1,78 +1,302 @@
 # Projeto Solaris
 
-Sistema web de gerenciamento e simulação de cultivo de plantas, feito para ajudar
-o usuário a acompanhar o desenvolvimento das suas plantas de forma visual e
-intuitiva.
+Sistema web de gerenciamento e simulação de cultivo de plantas. O usuário monta
+o seu jardim virtual, registra as regas e acompanha uma **simulação idealizada
+em linha do tempo** (da brotação até a fase adulta), com um indicador de "humor"
+da planta inspirado em um tamagotchi digital.
 
-O projeto tem foco estrito em engenharia de interface: semântica web,
-responsividade, acessibilidade e desempenho.
+A versão atual (Trabalho II) transforma o protótipo estático do Trabalho I em uma
+aplicação **cliente–servidor**: front-end em HTML/CSS/JavaScript puro, back-end
+em **Java com Spring Boot** e banco **MySQL**, com autenticação, dois perfis de
+acesso e dados persistidos no servidor.
 
-**Site publicado:** <https://guilhermebertola1.github.io/Projeto-Solaris/>
 **Repositório:** <https://github.com/GuilhermeBertola1/Projeto-Solaris>
 
-> Trabalho Individual I — Sistemas para Comunicação (SCOM), UNESP Sorocaba.
+> Trabalho Individual II — Sistemas para Comunicação (SCOM), UNESP Sorocaba.
 > Autor: Guilherme Fontes Bertola (RA 241270596).
 > Prof. Leopoldo André Dutra Lusquino Filho.
 
 ---
 
-## Objetivo do projeto
+## Funcionalidades
 
-Muitas pessoas desistem de cultivar plantas por ansiedade ou por falta de
-conhecimento sobre o tempo natural de crescimento de cada espécie. O Projeto
-Solaris responde a isso com uma interface em que o usuário adiciona plantas ao
-seu jardim virtual e visualiza uma **simulação idealizada em linha do tempo**
-(da germinação até a fase adulta), com um indicador de "humor" da planta
-inspirado em um tamagotchi digital.
+**Visitante (sem login)**
 
-O objetivo técnico é entregar uma interface limpa, acessível e responsiva, com
-boa experiência de uso em qualquer dispositivo.
+* Consulta o catálogo de 100 espécies, com busca por nome popular ou científico
+  e paginação.
+* Cria a própria conta e faz login.
+
+**Usuário (`USUARIO`)**
+
+* **Meu Jardim** — CRUD das próprias plantas (adicionar, editar apelido e data de
+  plantio, remover), com destaque automático para as que precisam de rega.
+* **Perfil e simulação** — fase atual, barra de progresso da fase, humor,
+  previsão da próxima rega, ficha de cuidados e histórico paginado de regas.
+* Cada usuário vê e altera **somente as próprias plantas**.
+
+**Administrador (`ADMIN`)**
+
+* Tudo o que o usuário faz, mais o painel de **Administração**:
+  * cadastro, edição e ativação/desativação de espécies do catálogo;
+  * listagem de usuários e ativação/desativação de contas.
+
+| Recurso                             | Visitante | USUARIO | ADMIN |
+|-------------------------------------|:---------:|:-------:|:-----:|
+| Ver catálogo                        | sim       | sim     | sim   |
+| CRUD e regas do próprio jardim      | não       | sim     | sim   |
+| Jardim de outro usuário             | não       | não     | não   |
+| Gerenciar espécies                  | não       | não     | sim   |
+| Ativar/desativar usuários           | não       | não     | sim   |
 
 ---
 
-## Funcionalidades
+## Tecnologias
 
-* **Catálogo de busca** — procura espécies de plantas (API Perenual, com
-  fallback para um banco local de 100 espécies) e adiciona ao jardim virtual.
-* **Meu Jardim** — painel principal com as plantas do usuário e destaque
-  automático para as que precisam de rega.
-* **Perfil e simulação** — linha do tempo com o estágio atual de desenvolvimento
-  (Brotação → Crescimento Vegetativo → Fase Adulta), barra de progresso da fase,
-  ficha de cuidados, previsão da próxima rega, histórico das últimas regas e
-  remoção com confirmação em dois passos.
-* **Orientações por espécie** — as recomendações de cada fase são geradas a
-  partir da categoria da planta, da exigência de luz e do regime de rega. Uma
-  suculenta não recebe a mesma instrução de adubação que um tomateiro.
+| Camada         | Tecnologia                                                        |
+|----------------|-------------------------------------------------------------------|
+| Front-end      | HTML5, CSS3 e JavaScript puro (sem framework), padrão MVVM        |
+| Back-end       | Java 21, Spring Boot 4.1 (Web MVC, Data JPA, Security, Validation)|
+| Banco de dados | MySQL 8.4, migrações com Flyway                                   |
+| Testes         | JUnit 5, AssertJ, Spring MockMvc, Testcontainers                  |
+| Execução       | Docker e Docker Compose                                           |
 
 ---
 
 ## Como executar
 
-O projeto é um protótipo front-end estático: **não precisa de servidor, Node.js,
-build step ou banco de dados.**
+### Pré-requisitos
 
-A forma mais rápida de ver o projeto rodando é abrir o site publicado:
-<https://guilhermebertola1.github.io/Projeto-Solaris/>
+* **Docker Desktop** (ou Docker Engine + Compose) — obrigatório nas duas formas.
+* Para rodar sem container (opção B): **JDK 21** e **Maven 3.9+**.
 
-Para rodar localmente:
+### 1. Clonar e configurar o `.env`
 
-1. Clone o repositório:
+```bash
+git clone https://github.com/GuilhermeBertola1/Projeto-Solaris.git
+cd Projeto-Solaris
+cp .env.example .env        # no cmd do Windows: copy .env.example .env
+```
 
-   ```bash
-   git clone https://github.com/GuilhermeBertola1/Projeto-Solaris.git
-   ```
+Abra o `.env` e preencha os valores. Nenhuma senha fica no código: tudo vem
+dessas variáveis.
 
-2. Abra o arquivo `index.html` diretamente em um navegador moderno
-   (Chrome, Firefox ou Edge). É só dar duplo clique.
+| Variável           | Para que serve                                                       |
+|--------------------|----------------------------------------------------------------------|
+| `DB_ROOT_SENHA`    | senha do root do MySQL (usada só pelo container do banco)            |
+| `DB_USUARIO`       | usuário que a aplicação usa no banco                                 |
+| `DB_SENHA`         | senha desse usuário                                                  |
+| `DB_URL`           | endereço do banco quando a aplicação roda fora do container          |
+| `ADMIN_EMAIL`      | e-mail do administrador criado na primeira subida                    |
+| `ADMIN_SENHA`      | senha desse administrador (**mínimo de 12 caracteres**)              |
+| `PERENUAL_API_KEY` | chave da API Perenual (opcional; reservada para importação futura)   |
 
-> O projeto usa **scripts clássicos com namespace global** (`window.Solaris`) em
-> vez de ES Modules justamente para funcionar assim. Navegadores bloqueiam
-> `import`/`export` no protocolo `file://` por política de CORS; com o namespace,
-> a página abre direto do disco, sem servidor local.
->
-> Quando a página é aberta por `file://`, as requisições à API externa também
-> seriam bloqueadas — por isso o catálogo detecta o protocolo e usa direto o
-> banco local, sem gerar erros no console.
+> O `.env` está no `.gitignore` e no `.dockerignore`: ele nunca vai para o
+> repositório nem para dentro da imagem Docker.
+
+### Opção A — tudo em containers (recomendada)
+
+Na raiz do projeto:
+
+```bash
+docker compose up -d --build
+```
+
+O Compose sobe o MySQL, espera ele ficar saudável (healthcheck) e só então sobe
+a aplicação. A primeira execução demora alguns minutos por causa do download das
+dependências do Maven dentro da imagem.
+
+Acompanhe a inicialização até aparecer `Started SolarisApplication`:
+
+```bash
+docker compose logs -f APP
+```
+
+Depois, acesse **<http://localhost:8080>**.
+
+Comandos úteis:
+
+| Comando                        | O que faz                                              |
+|--------------------------------|--------------------------------------------------------|
+| `docker compose ps`            | mostra os containers e o estado de saúde               |
+| `docker compose stop`          | para os containers, mantendo os dados                  |
+| `docker compose up -d --build` | reconstrói a imagem depois de alterar o código         |
+| `docker compose down -v`       | **apaga** containers e volumes (banco volta do zero)   |
+
+### Opção B — aplicação pelo Maven (desenvolvimento)
+
+Sobe só o banco em container e roda a aplicação na máquina:
+
+```bash
+docker compose up -d MYSQL
+cd backend
+mvn spring-boot:run
+```
+
+A aplicação lê o mesmo `.env` da raiz e fica em **<http://localhost:8080>**.
+
+> As opções A e B usam a porta 8080. Para usar a B, pare antes o container da
+> aplicação com `docker compose stop APP`.
+
+### Primeiro acesso
+
+* **Administrador:** na primeira subida, a aplicação cria a conta definida em
+  `ADMIN_EMAIL` / `ADMIN_SENHA`. Entre por `login.html` e o menu passa a exibir
+  o link **Administração**.
+* **Usuário comum:** crie uma conta em `cadastro.html`.
+
+O banco já vem com o catálogo de 100 espécies, as fases e os demais dados de
+apoio, inseridos pela migração `V2__seed.sql`.
+
+---
+
+## Testes automatizados
+
+São **31 testes**, executados com:
+
+```bash
+cd backend
+mvn test
+```
+
+| Classe                      | Tipo       | O que verifica                                                |
+|-----------------------------|------------|---------------------------------------------------------------|
+| `SimulacaoTest`             | unitário   | fases, progresso, humor e próxima rega                         |
+| `LimitadorDeLoginTest`      | unitário   | limite de tentativas de login e liberação após 15 min          |
+| `CatalogoIntegracaoTest`    | integração | catálogo público, busca sem acento, SQL Injection na busca, paginação inválida, 404 |
+| `SegurancaIntegracaoTest`   | integração | 401/403, CSRF, mensagem genérica no login, cadastro que tenta escolher o perfil, listagem sem hash, logout, rate limit e conta desativada |
+| `JardimIntegracaoTest`      | integração | ciclo completo do CRUD e das regas, isolamento entre usuários, validação e HTML no apelido tratado como texto (XSS) |
+
+Os testes de integração sobem um **MySQL 8.4 real e descartável** com
+Testcontainers, aplicam as mesmas migrações do Flyway e não tocam no banco de
+desenvolvimento. Por isso o **Docker precisa estar rodando** durante o
+`mvn test`. Os relatórios ficam em `backend/target/surefire-reports/`.
+
+---
+
+## Documentação da API
+
+* **[`docs/API.md`](docs/API.md)** — todas as rotas, permissões, corpos de
+  requisição, respostas, paginação e códigos de erro.
+* **[`backend/api.http`](backend/api.http)** — requisições prontas para
+  executar com a extensão REST Client do VS Code.
+
+Resumo das rotas:
+
+| Prefixo               | Acesso        | Conteúdo                                         |
+|-----------------------|---------------|--------------------------------------------------|
+| `/api/auth`           | público/login | CSRF, cadastro, login, logout e usuário atual    |
+| `/api/especies`       | público       | catálogo (somente leitura)                       |
+| `/api/plantas`        | autenticado   | CRUD do jardim e regas                           |
+| `/api/admin/especies` | ADMIN         | CRUD e ativação de espécies                      |
+| `/api/admin/usuarios` | ADMIN         | listagem e ativação de usuários                  |
+
+Todos os erros seguem o formato **Problem Details (RFC 9457)**, com `status`,
+`title`, `detail` e, nos erros de validação, o mapa `campos` com a mensagem de
+cada campo inválido.
+
+---
+
+## Banco de dados
+
+O esquema é criado e versionado pelo **Flyway** a cada subida da aplicação:
+
+| Arquivo                                            | Conteúdo                              |
+|----------------------------------------------------|---------------------------------------|
+| `backend/src/main/resources/db/migration/V1__schema.sql` | tabelas, chaves e constraints   |
+| `backend/src/main/resources/db/migration/V2__seed.sql`   | dados iniciais e catálogo       |
+| `database/solaris.sql`                             | script consolidado (V1 + V2) para criar o banco manualmente |
+
+Tabelas: `perfil`, `usuario`, `categoria`, `fase`, `orientacao_fase`,
+`nivel_luz`, `regime_rega`, `especie`, `planta` e `rega`.
+
+As regras de integridade ficam também no banco, e não só no Java: chaves
+estrangeiras, `UNIQUE` (e-mail do usuário, códigos das tabelas de apoio, id da
+Perenual) e `CHECK` (por exemplo, a origem de uma espécie). O Hibernate roda com `ddl-auto=validate`: ele confere se
+as entidades batem com o esquema, mas nunca altera o banco.
+
+---
+
+## Arquitetura
+
+```
+Navegador (HTML + CSS + JS)
+        │  fetch JSON, cookie de sessão, cabeçalho X-XSRF-TOKEN
+        ▼
+Spring Boot :8080 ── serve também os arquivos de frontend/
+        │  JPA / Hibernate
+        ▼
+MySQL 8.4 :3306
+```
+
+### Back-end — arquitetura em camadas
+
+```
+backend/src/main/java/solaris/
+├── controller/   recebe o HTTP, valida a entrada (@Valid) e devolve DTOs
+├── service/      regras de negócio e transações (inclui a posse das plantas)
+├── repository/   acesso ao banco com Spring Data JPA
+├── domain/       entidades JPA e enums
+├── dto/          records de entrada e saída da API (a entidade nunca sai crua)
+├── simulacao/    regra pura da simulação (fases, humor, rega), sem Spring
+├── seguranca/    configuração do Spring Security, admin inicial, rate limit
+└── erro/         exceções da aplicação e tratador global (Problem Details)
+```
+
+Cada camada só conhece a de baixo: o controller não acessa o repositório e a
+entidade não é exposta diretamente na resposta.
+
+### Front-end — MVVM sem framework
+
+```
+frontend/
+├── index.html, perfil.html        jardim e simulação (exigem login)
+├── catalogo.html                  catálogo público
+├── login.html, cadastro.html      autenticação
+├── admin.html                     painel do administrador
+├── css/style.css                  folha única com design tokens
+└── js/
+    ├── models/       apiCliente (fetch + CSRF + erros), authModel, plantasModel,
+    │                 jardimModel, simulacaoModel, adminModel, imagemModel
+    ├── viewmodels/   estado reativo com Proxy (catálogo, jardim, admin)
+    ├── views/        cardPlanta, formularioView, menuSessao
+    └── *App.js       ponto de entrada de cada página
+```
+
+* **Model** — conversa com a API e traduz as respostas para o formato da tela.
+* **ViewModel** — o estado é um `Proxy`: qualquer atribuição dispara o re-render.
+* **View** — manipula o DOM a partir do estado.
+
+---
+
+## Segurança
+
+| Ameaça / requisito         | Medida adotada                                                                 |
+|----------------------------|--------------------------------------------------------------------------------|
+| Senhas                     | hash **BCrypt** (custo 12); a senha nunca é gravada nem registrada em log      |
+| Sessão                     | cookie `JSESSIONID` `HttpOnly` e `SameSite=Strict`, expira em 30 min; o id da sessão é trocado no login (anti session fixation) |
+| CSRF                       | token em cookie `XSRF-TOKEN` exigido no cabeçalho `X-XSRF-TOKEN` em toda requisição que altera dados |
+| Controle de acesso         | rotas protegidas por perfil (`ADMIN` herda `USUARIO`); recurso de outro usuário responde 404 |
+| Força bruta                | 5 logins falhos por IP em 15 min → `429 Too Many Requests` com `Retry-After`   |
+| Conta desativada           | perde a sessão na requisição seguinte e não consegue mais logar                |
+| SQL Injection              | consultas parametrizadas via JPA/JPQL; nenhuma SQL montada com concatenação    |
+| XSS                        | escape de todo texto inserido no DOM + **Content-Security-Policy** (`script-src 'self'`) |
+| Validação                  | Bean Validation em todos os DTOs de entrada, repetida no banco por constraints |
+| Vazamento de informação    | erros padronizados sem stack trace; detalhes técnicos só no log do servidor   |
+| Credenciais                | nenhuma no código: tudo em `.env`, fora do Git e da imagem Docker              |
+| Container                  | aplicação roda com usuário sem privilégios; portas publicadas só em `127.0.0.1`|
+
+---
+
+## Logs
+
+A aplicação registra, com data e hora, inicialização, cadastros, logins
+(sucesso e falha, com IP), ações administrativas e erros inesperados.
+
+* **Docker:** `docker compose logs -f APP`, e o arquivo `logs/solaris.log` no
+  volume `logs-app`.
+* **Maven:** `backend/logs/solaris.log`.
+
+O arquivo é rotacionado a cada 10 MB, guardando 14 arquivos.
 
 ---
 
@@ -80,276 +304,73 @@ Para rodar localmente:
 
 ```
 Projeto-Solaris/
-├── index.html               Meu Jardim (painel principal)
-├── catalogo.html            busca e adição de plantas
-├── perfil.html              perfil e simulação de uma planta
-├── css/
-│   └── style.css            folha de estilo única, com design tokens
-├── js/                      ver a seção "Arquitetura"
-├── assets/images/           fotos do banco local e placeholder
-├── evidencias/              histórico de commits (git-log.txt)
-└── .github/workflows/
-    └── deploy-pages.yml     publicação automática no GitHub Pages
+├── backend/            aplicação Spring Boot (pom.xml, src/, api.http)
+├── frontend/           páginas, CSS, JavaScript e imagens
+├── database/           script SQL consolidado
+├── docs/               documentação da API
+├── compose.yaml        MySQL + aplicação
+├── Dockerfile          build multi-stage da aplicação
+├── .env.example        modelo das variáveis de ambiente
+├── .gitattributes      normalização de fim de linha
+└── .github/workflows/  publicação da versão estática (T1) no GitHub Pages
 ```
-
----
-
-## Arquitetura
-
-Construído sem frameworks, para priorizar o domínio dos fundamentos da web.
-A organização segue o padrão **MVVM**:
-
-```
-js/
-├── utils.js                    escape de HTML, debounce e exibição da página
-├── models/                     dados e regras de negócio (sem DOM)
-│   ├── dados_locais.js         banco local de 100 espécies, com categoria
-│   ├── plantasModel.js         API Perenual + fallback local
-│   ├── imagemModel.js          cópia local das fotos e fallback visual
-│   ├── jardimModel.js          persistência em localStorage
-│   └── simulacaoModel.js       fases, humor e regime de rega por espécie
-├── viewmodels/                 estado reativo via Proxy
-│   ├── catalogoViewModel.js
-│   └── jardimViewModel.js
-├── views/
-│   └── cardPlanta.js           template do card, compartilhado
-├── dashboardApp.js             view de index.html
-├── catalogoApp.js              view de catalogo.html
-└── perfilApp.js                view de perfil.html
-```
-
-* **Model** — acesso a dados e regras puras, sem tocar no DOM, o que permite
-  reaproveitar e testar as regras de forma isolada.
-* **ViewModel** — o estado é um `Proxy`: qualquer atribuição dispara o re-render
-  da View. É reatividade sem framework, em ~15 linhas.
-* **View** — manipula o DOM a partir do estado do ViewModel.
-
-Os `<script>` são carregados na ordem de dependência no fim do `<body>` de cada
-página.
-
----
-
-## Decisão técnica: por que as fotos são copiadas para o localStorage
-
-A API Perenual não devolve uma URL de imagem comum. Devolve uma **URL assinada
-da AWS**, com validade declarada no próprio endereço:
-
-```
-.../thumbnail/foto.jpg?X-Amz-Signature=...&X-Amz-Expires=86400
-```
-
-São 24 horas. Depois disso o servidor responde **403** e a imagem morre. Como o
-jardim é persistido no navegador, guardar essa URL significava que toda foto
-salva quebrava no dia seguinte — foi exatamente o que aconteceu em produção.
-
-A correção não foi tratar o sintoma, e sim a premissa: **uma referência temporária
-não pode ser persistida como se fosse permanente.** No momento em que a planta
-entra no jardim, a imagem é baixada e redesenhada em um `<canvas>` no tamanho do
-card (300×225, JPEG a 72%, ~16 KB) e guardada como data URI junto dos dados.
-
-Ganhos:
-
-* o jardim funciona **offline** e não expira;
-* o "Meu Jardim" passa a ter **zero requisições a terceiros**, o que tira o LCP
-  de um servidor externo e melhora a nota de desempenho;
-* uma rede de segurança adicional troca qualquer imagem que falhe ao carregar
-  pelo placeholder local, em vez de exibir o ícone de imagem quebrada.
-
-O plano gratuito da API também devolve uma imagem genérica de "faça upgrade" no
-lugar da foto real de muitas espécies; ela é detectada e substituída pelo
-placeholder.
-
----
-
-## Design tokens
-
-Toda a identidade visual sai de variáveis CSS declaradas em `:root`.
-
-**Paleta principal — 6 cores.** Todas as demais são variações claras destas:
-
-| Token               | Valor     | Uso                                  |
-|---------------------|-----------|--------------------------------------|
-| `--cor-primaria`    | `#2e7d32` | botões, links, títulos               |
-| `--cor-secundaria`  | `#1b5e20` | estados hover e foco                 |
-| `--cor-destaque`    | `#8a4b00` | painel de dicas                      |
-| `--cor-fundo`       | `#f8faf8` | fundo da página e das superfícies    |
-| `--cor-texto`       | `#1c2d1c` | texto principal                      |
-| `--cor-texto-suave` | `#4a5d4a` | texto secundário e bordas de campo   |
-
-Outros tokens: `--raio-sm` / `--raio-md` (raios de borda), `--medida-texto`
-(largura máxima de linha, 65ch), `--sombra-card` / `--sombra-hover`,
-`--espaco-secao` e `--fonte-principal` (uma única família tipográfica, a do
-sistema).
-
----
-
-## Acessibilidade (WCAG 2.2 nível AA)
-
-* Estrutura semântica completa: `header`, `nav`, `main`, `section`, `article`,
-  `aside`, `footer`, `figure`, `figcaption`.
-* Hierarquia de títulos lógica, com exatamente um `h1` por página.
-* Link "Pular para o conteúdo principal" como primeiro elemento focável.
-* Navegação completa por teclado, com foco visível (`:focus-visible`, 3px).
-* Após "Reguei hoje" o foco volta para o botão, que é recriado no re-render.
-* Regiões `aria-live` anunciam a adição ao jardim e a rega a leitores de tela.
-* `aria-current="page"` marca a página atual na navegação.
-* Todas as imagens têm `alt`; sprites decorativos usam `alt=""` para não
-  duplicar a informação já presente no texto ao lado.
-* Rótulos de link e de botão únicos, com o nome da planta em texto só para
-  leitor de tela.
-* Barra de progresso com `role="progressbar"` e `aria-valuetext`, para o leitor
-  de tela anunciar "Dia 7 de 15 nesta fase" em vez de apenas um percentual.
-* Remoção de planta em dois passos inline, e não com `confirm()`: o diálogo
-  nativo trava a página e é hostil a tecnologia assistiva.
-* Contraste verificado em todos os pares de cor: mínimo de 4.89:1 para texto
-  e 6.77:1 para bordas de componente (o mínimo exigido é 4.5:1 e 3:1).
-* `prefers-reduced-motion` respeitado.
-
-Resultado: **100/100 em Acessibilidade no Lighthouse nas três páginas.**
-
----
-
-## Responsividade
-
-Três faixas, com layout distinto em cada uma:
-
-| Faixa                | Largura           | Layout                        |
-|----------------------|-------------------|-------------------------------|
-| Celular              | até 600px         | 1 coluna, navegação empilhada |
-| Tablet/intermediário | 601px a 900px     | 2 colunas                     |
-| Desktop              | acima de 900px    | grade fluida (`auto-fill`)    |
-
-Nenhuma das faixas apresenta rolagem horizontal.
-
----
-
-## Desempenho
-
-* Sem dependências externas, sem framework e sem build step.
-* Fonte do sistema — nenhum arquivo de fonte é baixado.
-* Imagens com `width`/`height` explícitos e `aspect-ratio` no CSS, o que evita
-  deslocamento de layout (CLS).
-* As fotos do jardim são servidas do próprio navegador (data URI), sem conexão
-  a servidores de terceiros.
-* `preconnect` para a API e para o host das imagens na única página que os usa.
-* Os primeiros cards de cada lista carregam com `loading="eager"` e
-  `fetchpriority="high"`; o restante usa `loading="lazy"`. Aplicar lazy loading
-  à maior imagem visível atrasaria o LCP.
-* A busca do catálogo usa debounce de 300ms, para não disparar uma requisição
-  por tecla digitada.
-* O conteúdo só é exibido depois de montado (classe `js-montando`, com timeout de
-  segurança), o que zerou o CLS de 0,533 para 0.
-
----
-
-## Resultados das auditorias
-
-Lighthouse (Chrome DevTools, **modo mobile**, site publicado no GitHub Pages):
-
-| Página         | Desempenho | Acessibilidade | Boas práticas | SEO |
-|----------------|------------|----------------|---------------|-----|
-| `index.html`   | 99         | 100            | 100           | 100 |
-| `catalogo.html`| 94         | 100            | 100           | 100 |
-| `perfil.html`  | 98         | 100            | 100           | 100 |
-
-Nas três páginas: **CLS 0**, LCP máximo de 2,1s e TBT máximo de 80ms.
-
-Validação de código:
-
-| Ferramenta                        | Resultado            |
-|-----------------------------------|----------------------|
-| W3C Nu HTML Checker (3 páginas)   | 0 erros, 0 avisos    |
-| W3C CSS Validator (CSS 3 + SVG)   | 0 erros              |
-
-Compatibilidade verificada manualmente (Windows 11 25H2):
-
-| Navegador | Versão           | Resultado |
-|-----------|------------------|-----------|
-| Chrome    | 153.0.8010.53    | ok        |
-| Firefox   | 156.0            | ok        |
-| Edge      | 153.0.4234.48    | ok        |
-
-As capturas de tela dessas auditorias estão no Apêndice B do relatório do
-trabalho, e o histórico de commits em `evidencias/git-log.txt`.
-
----
-
-## Persistência de dados
-
-O jardim é salvo no `localStorage` do navegador, na chave `solaris_meuJardim`.
-Isso significa que:
-
-* os dados ficam apenas no navegador e no dispositivo usado;
-* limpar os dados do navegador apaga o jardim salvo;
-* não há sincronização entre dispositivos — fora do escopo deste trabalho, que
-  é um protótipo front-end estático sem backend.
-
----
-
-## Publicação
-
-O site é publicado automaticamente pelo GitHub Pages através do workflow
-`.github/workflows/deploy-pages.yml`. A cada `git push` na branch `main`, o
-GitHub Actions republica a pasta do projeto — não há etapa manual de deploy.
 
 ---
 
 ## Versionamento
 
-O histórico segue o padrão **Conventional Commits**, com os prefixos `feat`,
-`fix`, `refactor`, `perf`, `style`, `docs` e `chore`. O log completo está em
-`evidencias/git-log.txt`, gerado com:
+* Commits no padrão **Conventional Commits** (`feat`, `fix`, `refactor`,
+  `test`, `docs`, `build`, `chore`).
+* Uma branch por etapa (`feat/banco`, `feat/backend-base`, `feat/catalogo`,
+  `feat/autenticacao`, `feat/jardim`, `feat/admin`, `feat/front-integracao`,
+  `test/automatizados`, `chore/fechamento`), integradas à `main` com
+  `merge --no-ff` para preservar o histórico de cada etapa.
+* Tags de entrega: `v1.0-t1` (Trabalho I) e `v2.0-t2` (Trabalho II).
 
 ```bash
-git log --oneline --graph
+git log --oneline --graph --all
 ```
 
 ---
 
-## Checklist de boas práticas
+## Interface (herdado do Trabalho I)
 
-| Item                                    | Situação |
-|-----------------------------------------|----------|
-| DOCTYPE HTML5 correto                   | ok       |
-| Atributo `lang`                         | ok       |
-| Meta viewport                           | ok       |
-| Meta description                        | ok       |
-| HTML sem erros no W3C Validator         | ok       |
-| CSS sem erros no W3C Validator          | ok       |
-| CSS externo separado do HTML            | ok       |
-| Uso predominante de unidades relativas  | ok       |
-| Imagens com `alt`                       | ok       |
-| Imagens com `loading="lazy"`            | ok (exceto as de prioridade, por decisão de LCP) |
-| Dimensões explícitas de imagens         | ok       |
-| Uso de Flexbox e Grid                   | ok       |
-| Ausência de estilos inline              | ok       |
-| Ausência de IDs duplicados              | ok       |
-| Ausência de links quebrados             | ok       |
-| Foco visível                            | ok       |
-| Contraste WCAG adequado                 | ok       |
-| Labels associados a formulários         | ok       |
-| Navegação por teclado funcional         | ok       |
-| Estrutura semântica completa            | ok       |
-| Uso de variáveis CSS (`:root`)          | ok       |
+O cuidado com a interface do Trabalho I foi mantido nas páginas novas:
+
+* **Acessibilidade (WCAG 2.2 AA):** estrutura semântica, um `h1` por página,
+  link "Pular para o conteúdo", foco visível, navegação por teclado, regiões
+  `aria-live`, `aria-current`, barra de progresso com `aria-valuetext`,
+  formulários com `label` e mensagens de erro associadas aos campos, contraste
+  mínimo de 4,89:1 e `prefers-reduced-motion`.
+* **Responsividade:** três faixas (até 600px, 601–900px e acima de 900px), sem
+  rolagem horizontal.
+* **Design tokens:** identidade visual centralizada em variáveis CSS no `:root`.
+* **Desempenho:** sem framework nem build step, fonte do sistema, imagens com
+  dimensões explícitas e montagem da página sem deslocamento de layout (CLS 0).
+
+Na entrega do Trabalho I, o Lighthouse (modo mobile) marcou 100 em
+Acessibilidade, Boas práticas e SEO nas três páginas, e 94 a 99 em Desempenho.
 
 ---
 
 ## Limitações conhecidas
 
-* A chave da API Perenual fica exposta no código-fonte do front-end
-  (`js/models/plantasModel.js`), porque o projeto não tem backend nem proxy para
-  escondê-la. Em produção real ela deveria ficar em um servidor intermediário.
-* O cálculo de humor da planta usa um intervalo fixo de dias sem rega, e não a
-  frequência real recomendada por espécie — a API não fornece esse dado de forma
-  padronizada.
-* A simulação de crescimento é idealizada: usa apenas o tempo desde a adição, sem
-  considerar clima, substrato ou condições reais de cultivo.
+* O GitHub Pages hospeda apenas a versão estática do Trabalho I (tag `v1.0-t1`).
+  A versão atual precisa do back-end e do banco, então deve ser executada
+  localmente, como descrito acima.
+* O limite de tentativas de login fica em memória: reinicia junto com a
+  aplicação e vale para uma única instância.
+* A importação de espécies da API Perenual ainda não foi implementada. O banco
+  já está preparado para ela (coluna `perenual_id` e origem `PERENUAL`).
+* A simulação de crescimento é idealizada: considera apenas o tempo desde o
+  plantio e as regas, sem clima, substrato ou condições reais de cultivo.
 
 ---
 
 ## Uso de inteligência artificial
 
-Ferramentas de IA (Claude e Gemini) foram usadas como apoio no desenho da
-arquitetura MVVM, na revisão de acessibilidade e na investigação dos problemas de
-desempenho. Todo o código foi revisado, testado e validado pelo autor. A
-declaração detalhada está na Seção 11 do relatório do trabalho.
+Ferramentas de IA foram usadas como apoio no planejamento das etapas, na
+explicação de conceitos (Spring Security, CSRF, Testcontainers, Docker), na
+revisão do código escrito pelo autor e na investigação de erros. O código foi
+escrito, revisado, testado e validado pelo autor. A declaração detalhada está no
+relatório do trabalho.
